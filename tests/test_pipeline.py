@@ -351,3 +351,9 @@ def test_imported_competitor_headline_not_counted_for_brand(cfg):
     from monitor.models import Mention
     m = Mention.from_raw(raw("Skretting launches new salmon feed"), ["biomar"])  # imported, tagged BioMar
     assert headline_entities(cfg, m) == ["skretting"]
+
+
+def test_possessives_and_ad_banners(cfg):
+    assert "cargill-aqua" in match_entities(cfg, "Kolmulen kan snart forsvinne fra fiskefôret. Dette er Cargills plan B.")
+    assert cfg.ignored("BioMar SmartCare Assist Skin — 980x300")
+    assert not cfg.ignored("BioMar posts record volumes")

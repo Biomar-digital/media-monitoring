@@ -169,6 +169,13 @@ trade_domains: [
 # (Schouw & Co is BioMar's former parent; SCHO is its ticker).
 ignore_unless_brand_named: ["Schouw", "SCHO:"]
 
+# Headlines that are never coverage (e.g. ad banners listed in publishers' feeds:
+# "BioMar SmartCare Assist Skin — 980x300"). Regular expressions.
+ignore_headlines:
+  - '[—–-]\s*\d{2,4}\s*x\s*\d{2,4}\s*$'
+  - '^(Annonse|Annonce|Sponsored|Advertisement)\b'
+
+
 # Stock-data pages: automatically generated price, ratio and holdings pages (not journalism).
 # They're kept and labelled "Stock data"; the dashboard can include or exclude them.
 stock_data:
@@ -279,7 +286,7 @@ rss_feeds:
   - name: iLaks
     url: https://ilaks.no/feed/
     country: "NO"
-    pages: 3
+    pages: 5
   - name: iQua
     url: https://iqua.no/feed/
     country: "NO"

@@ -173,6 +173,13 @@
   const brandId = () => DATA.brand;
   const companies = () => [ENT[brandId()], ...ofType("competitor")];
 
+  // Like-for-like coverage for company comparisons: only articles this tracker collected
+  // (every company searched the same way), without BioMar hits that come only from an
+  // executive search. Imported BioMar-only history would otherwise inflate BioMar's share.
+  function comparable(ms) {
+    const b = brandId();
+    return ms.filter((m) => m.cmp !== false).map((m) => (m.bx ? { ...m, e: m.e.filter((x) => x !== b) } : m));
+  }
   function countBy(ms, ids) {
     const c = Object.fromEntries(ids.map((i) => [i, 0]));
     for (const m of ms) for (const e of m.e) if (e in c) c[e]++;
@@ -307,10 +314,11 @@
     const bid = brandId();
     const ids = companies().map((e) => e.id);
     const cc = countBy(cur, ids), pc = prev ? countBy(prev, ids) : null;
-    const total = ids.reduce((a, i) => a + cc[i], 0);
-    const ptotal = pc ? ids.reduce((a, i) => a + pc[i], 0) : 0;
-    const sov = total ? cc[bid] / total : 0;
-    const psov = pc && ptotal ? pc[bid] / ptotal : null;
+    const sc = countBy(comparable(cur), ids), spc = prev ? countBy(comparable(prev), ids) : null;
+    const total = ids.reduce((a, i) => a + sc[i], 0);
+    const ptotal = spc ? ids.reduce((a, i) => a + spc[i], 0) : 0;
+    const sov = total ? sc[bid] / total : 0;
+    const psov = spc && ptotal ? spc[bid] / ptotal : null;
     const tone = toneBy(cur, bid), ptone = prev ? toneBy(prev, bid) : null;
     const execIds = ofType("executive").map((e) => e.id);
     const ex = cur.filter((m) => m.e.some((e) => execIds.includes(e))).length;
@@ -459,7 +467,7 @@
   // Share of voice: emphasis on BioMar, competitors recede
   // ---------------------------------------------------------------------------------
   function renderSov() {
-    const ms = slice(0);
+    const ms = comparable(slice(0));
     const ids = companies().map((e) => e.id);
     const c = countBy(ms, ids);
     const total = ids.reduce((a, i) => a + c[i], 0);
@@ -470,12 +478,12 @@
       tip: [{ k: "Share of voice", v: total ? pct(c[id] / total) : "0%" }, { k: "Mentions", v: nf.format(c[id]) }],
     })).sort((a, b) => b.value - a.value);
     hbars($("sovChart"), rows, { highlight: brandId() });
-    const cs = DATA.competitors_since ? new Date(DATA.competitors_since).getTime() : null;
-    if (cs && now() - rangeDays() * DAY < cs - DAY) {
-      $("sovChart").append(h("p", { class: "note small", text:
-        `Competitors are tracked from ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(cs))}. ` +
-        "Earlier coverage comes from the imported BioMar history, so BioMar's share is overstated for this range." }));
-    }
+    const cs = DATA.competitors_since ? new Date(DATA.competitors_since) : null;
+    $("sovChart").append(h("p", { class: "note small", text:
+      `Based on ${nf.format(total)} articles. ` + (total < 100 ? "A small sample, so treat shares as indicative. " : "") +
+      "Like-for-like: only coverage this tracker collected, searching every company the same way" +
+      (cs ? ` (since ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(cs)})` : "") +
+      ". Imported BioMar history and executive-only articles are left out." }));
   }
 
   // ---------------------------------------------------------------------------------
@@ -483,7 +491,7 @@
   // ---------------------------------------------------------------------------------
   function renderSentiment() {
     const el = $("sentChart");
-    const ms = slice(0);
+    const ms = comparable(slice(0));
     const rows = companies().map((e) => ({ e, t: toneBy(ms, e.id) })).filter((r) => r.t.n > 0).sort((a, b) => b.t.net - a.t.net);
     if (!rows.length) return empty(el);
     const W = Math.max(280, el.clientWidth), rowH = 30, barH = 18, pad = 4;
@@ -537,7 +545,7 @@
   }
   function renderTrend() {
     const el = $("trendChart");
-    const ms = slice(0);
+    const ms = comparable(slice(0));
     const shown = trendIds(ms);
     // chips
     const chips = $("trendChips");

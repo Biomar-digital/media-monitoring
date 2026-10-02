@@ -13,11 +13,12 @@ DEFAULT_CONFIG = ROOT / "config" / "watchlist.yaml"
 
 
 def _phrase_pattern(phrases: list[str]) -> re.Pattern | None:
-    """Case-insensitive, whole-word match on any of the phrases."""
+    """Case-insensitive, whole-word match on any of the phrases, allowing a possessive
+    ending ("Cargills plan", "Skretting's results")."""
     if not phrases:
         return None
     alts = sorted((re.escape(p) for p in phrases), key=len, reverse=True)
-    return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")(?!\w)", re.IGNORECASE)
+    return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")(?:'s|’s|s)?(?!\w)", re.IGNORECASE)
 
 
 def _prefix_pattern(terms: list[str]) -> re.Pattern | None:
@@ -88,6 +89,7 @@ class Config:
     trade_domains: list[str] = field(default_factory=list)
     stock_data: dict = field(default_factory=dict)
     ignore_unless_brand_named: list[str] = field(default_factory=list)
+    ignore_headlines: list[str] = field(default_factory=list)
     local_search_terms: dict = field(default_factory=dict)
     site_sweeps: list = field(default_factory=list)
     country_domain_searches: list = field(default_factory=list)
@@ -95,6 +97,8 @@ class Config:
     def __post_init__(self) -> None:
         self._industry_re = _prefix_pattern(self.industry_context)
         self._trade = {d.lower() for d in self.trade_domains}
+        self._ignore_headline_re = (re.compile("|".join(f"(?:{p})" for p in self.ignore_headlines), re.IGNORECASE)
+                                    if self.ignore_headlines else None)
         self._ignore_re = (re.compile("|".join(re.escape(t) for t in self.ignore_unless_brand_named), re.IGNORECASE)
                            if self.ignore_unless_brand_named else None)
         self._stock_domains = {d.lower() for d in self.stock_data.get("domains", [])}
@@ -104,6 +108,8 @@ class Config:
     def ignored(self, title: str) -> bool:
         """Headline is about an organisation we deliberately don't track (e.g. Schouw & Co)
         and doesn't name the brand itself."""
+        if self._ignore_headline_re and self._ignore_headline_re.search(title):
+            return True
         return bool(self._ignore_re and self._ignore_re.search(title) and not self.entity(self.brand).named_in(title))
 
     def kind_of(self, title: str, source: str | None, domain: str | None) -> str:
@@ -156,6 +162,7 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> Config:
         trade_domains=raw.get("trade_domains", []),
         stock_data=raw.get("stock_data", {}),
         ignore_unless_brand_named=raw.get("ignore_unless_brand_named", []),
+        ignore_headlines=raw.get("ignore_headlines", []),
         local_search_terms=raw.get("local_search_terms", {}),
         site_sweeps=[tuple(x) for x in raw.get("site_sweeps", [])],
         country_domain_searches=[tuple(x) for x in raw.get("country_domain_searches", [])],

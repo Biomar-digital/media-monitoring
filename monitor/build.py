@@ -23,6 +23,14 @@ SITE_DIR = ROOT / "site"
 HISTORY_DAYS: int | None = None  # None = everything on record
 
 
+def _brand_only_via_executive(cfg: Config, m) -> bool:
+    """BioMar is attached only because an executive is named (competitors' executives
+    aren't tracked, so these don't count in like-for-like comparisons)."""
+    return (cfg.brand in m.entities and m.matched_by == "headline"
+            and not cfg.entity(cfg.brand).named_in(m.title)
+            and any(cfg.entity(e).type == "executive" for e in m.entities if e in cfg.entity_ids))
+
+
 def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HISTORY_DAYS) -> dict:
     source = store.load_since(history_days) if history_days else list(store.load_all().values())
     mentions = sorted(source, key=lambda m: m.published, reverse=True)
@@ -45,6 +53,10 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             "a": m.analysis,
             "mb": m.matched_by,
             "k": cfg.kind_of(m.title, m.source, m.source_domain),
+            # Comparable: found by this tracker's own collection, which searches every company
+            # the same way. Import-only rows come from a BioMar-only tracker.
+            "cmp": m.origins != ["import"],
+            "bx": _brand_only_via_executive(cfg, m),
         }
         for m in mentions
     ]
