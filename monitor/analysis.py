@@ -32,6 +32,13 @@ search, and the list of entities BioMar monitors: its own brand, its executives,
 competitors. Items may be in any language.
 
 For each item, return:
+Each item lists `keyword_matches` and `matched_by`. "headline" means the headline or snippet \
+names the entity. "search" means only the search engine's full-text match links it: the headline \
+may describe the entity generically (e.g. "analyst recommends feed producer"). For "search" \
+items, keep the entity unless the headline clearly concerns something unrelated; give \
+sentiment from the headline as it applies to that entity, and use importance 1 unless the \
+headline itself is significant.
+
 - relevant: false if the item is not actually about any monitored entity. Examples: a different \
 person who shares an executive's name, an unrelated company with a similar name, or a generic \
 use of a word. When false, the other fields may be empty.
@@ -116,7 +123,7 @@ def _claude_batch(client, cfg: Config, batch: list[Mention]) -> dict[str, dict] 
     import anthropic
 
     payload = [
-        {"id": m.id, "headline": m.title, "publisher": m.source, "snippet": m.snippet[:500], "keyword_matches": m.entities}
+        {"id": m.id, "headline": m.title, "publisher": m.source, "snippet": m.snippet[:500], "keyword_matches": m.entities, "matched_by": m.matched_by}
         for m in batch
     ]
     try:

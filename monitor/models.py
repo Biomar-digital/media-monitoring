@@ -37,6 +37,7 @@ class RawArticle:
     country: str | None = None  # ISO-3166 alpha-2 of the edition / publisher
     language: str | None = None
     origin: str = ""  # which collector found it: google_news | gdelt | rss
+    query_entity: str | None = None  # entity whose search query returned this article
 
     @property
     def key(self) -> str:
@@ -67,11 +68,15 @@ class Mention:
     title_en: str | None = None
     summary: str | None = None
     importance: int = 1  # 1 (routine) .. 3 (needs attention)
+    # headline: the headline/snippet names the entity. search: only the search engine's
+    # full-text match links it (e.g. "Pareto recommends feed producer").
+    matched_by: str = "headline"
     analysis: str = "pending"  # claude | lexicon | pending
 
     @classmethod
-    def from_raw(cls, raw: RawArticle, entities: list[str]) -> "Mention":
+    def from_raw(cls, raw: RawArticle, entities: list[str], matched_by: str = "headline") -> "Mention":
         return cls(
+            matched_by=matched_by,
             id=raw.key,
             title=raw.title,
             url=raw.url,

@@ -41,6 +41,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int = HISTORY_DAY
             "sm": m.summary,
             "im": m.importance,
             "a": m.analysis,
+            "mb": m.matched_by,
         }
         for m in mentions
     ]

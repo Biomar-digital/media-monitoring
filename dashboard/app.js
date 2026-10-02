@@ -642,6 +642,7 @@
         h("span", { text: m.s }),
         h("span", { text: countryName(m.c) }),
         h("span", { text: relTime(m.p) }),
+        m.mb === "search" ? h("span", { title: "The search engine matched the company in the article text; the headline doesn't name it.", text: "Full-text match" }) : null,
         ...m.e.map((e) => h("span", { class: "pill", text: ENT[e] ? ENT[e].name : e })),
         m.im >= 3 ? h("span", { class: "pill", style: "border-color:var(--critical)" }, h("span", { class: "attn-icon", text: "! " }), "Attention") : null));
   }

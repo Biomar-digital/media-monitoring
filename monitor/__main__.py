@@ -29,7 +29,7 @@ SOURCES = ("google_news", "gdelt", "rss")
 
 
 def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
-    queries = [q for e in cfg.entities for q in e.queries]
+    queries = [(e.id, q) for e in cfg.entities for q in e.queries]
     raws = []
     if "google_news" in sources:
         found = google_news.search(queries, cfg.google_news_editions, window=f"{window_days}d")

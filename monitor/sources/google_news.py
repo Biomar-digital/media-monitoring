@@ -90,11 +90,11 @@ def parse_feed(xml_text: str, edition: tuple) -> list[RawArticle]:
     return out
 
 
-def search(queries: list[str], editions: list[tuple], window: str = "2d", delay: float = 1.0) -> list[RawArticle]:
-    """Run every query in every edition. `window` uses Google's when: operator (e.g. 1d, 7d)."""
+def search(queries: list[tuple[str, str]], editions: list[tuple], window: str = "2d", delay: float = 1.0) -> list[RawArticle]:
+    """Run every (entity_id, query) in every edition. `window` uses Google's when: operator (e.g. 1d, 7d)."""
     results: list[RawArticle] = []
     with http.client() as c:
-        for q in queries:
+        for entity_id, q in queries:
             for edition in editions:
                 # (country, edition language[, UI language]) e.g. (BR, pt-419, pt-BR)
                 country, lang = edition[0], edition[1]
@@ -107,6 +107,8 @@ def search(queries: list[str], editions: list[tuple], window: str = "2d", delay:
                 r = http.get(c, SEARCH_URL, params=params)
                 if r is not None:
                     found = parse_feed(r.text, edition)
+                    for a in found:
+                        a.query_entity = entity_id
                     log.debug("google_news %r %s: %d", q, edition, len(found))
                     results.extend(found)
                 time.sleep(delay)

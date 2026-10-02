@@ -22,11 +22,14 @@ entities:
     type: brand
     color_slot: 1
     queries:
-      - '"BioMar"'
+      - '"BioMar" -"Rede Biomar" -"Projeto Biomar"'
       - '"BioMar Group"'
     aliases: ["BioMar", "Bio Mar Group", "BioMar Group", "BIOMAR"]
     exclude:
       - "BioMar Microbial"        # unrelated Spanish biotech
+      - "Rede Biomar"             # Brazilian marine-conservation network
+      - "Projeto Biomar"
+      - "Instituto Biomar"
       - "biomarker"
 
   # --- Executives -----------------------------------------------------------
@@ -76,8 +79,10 @@ entities:
     name: Skretting
     type: competitor
     color_slot: 2
+    # Skretting is also a Norwegian surname, so searches carry feed/aquaculture context terms.
     queries: ['"Skretting"']
     aliases: ["Skretting"]
+    needs_industry_context: true   # also a Norwegian surname
 
   - id: cargill-aqua
     name: Cargill Aqua Nutrition
@@ -124,6 +129,31 @@ entities:
     queries: ['"Haid Group"', '"Guangdong Haid"']
     aliases: ["Haid Group", "Guangdong Haid", "Haid"]
     require_context: ["feed", "aquaculture", "shrimp", "fish"]
+
+# Aquaculture/feed vocabulary (word prefixes, several languages). Used to accept articles
+# that the search engine matched on full text but whose headline doesn't name the company,
+# and to separate Skretting the company from people with that surname.
+industry_context: [
+  aquacult, aquafeed, aqua, feed, fish, salmon, trout, shrimp, prawn, seafood, tilapia, "sea bass", "sea bream", hatcher, krill, Nutreco,
+  fôr, fisk, laks, ørret, oppdrett, havbruk, sjømat, smolt, lus,          # Norwegian
+  foder, fiske, akvakultur, opdræt, ørred,                               # Danish
+  acuicult, alimento, salmón, camarón, langostino, pesca, pescado, piensos, # Spanish
+  aquicult, ração, camarão, tilápia, peixe,                               # Portuguese
+  aquacole, aliment, saumon, crevette, poisson,                           # French
+  "su ürünleri", balık, yem, levrek, çipura,                              # Turkish
+  ιχθυ, υδατοκαλλι,                                                      # Greek
+  "thủy sản", "thức ăn", tôm, cá,                                          # Vietnamese
+  水产, 饲料, 鱼, 虾,                                                      # Chinese
+  pakan, udang, budidaya, ikan,                                           # Indonesian
+]
+
+# Publishers whose coverage is all industry news: matches from these always count.
+trade_domains: [
+  intrafish.com, intrafish.no, undercurrentnews.com, fishfarmingexpert.com, salmonbusiness.com, ilaks.no, kyst.no,
+  feedstrategy.com, feednavigator.com, thefishsite.com, seafoodsource.com, globalseafood.org, hatcheryinternational.com,
+  aquafeed.com, salmonexpert.cl, aqua.cl, mundoacuicola.cl, diarioacuicola.cl, aquahoy.com, fis.com, aquaculturenorthamerica.com,
+  fishfarmermagazine.com, thefishsite.com, worldfishing.net, iqua.no, aquaculturemag.com, panoramaacuicola.com,
+]
 
 # Topics Claude assigns to each article (keep the list short and stable so trends are comparable).
 topics:

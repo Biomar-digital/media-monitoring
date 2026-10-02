@@ -46,6 +46,9 @@ def test_entity_matching_rules(cfg):
     assert match_entities(cfg, "Cargill grain exports rise") == []
     assert "cargill-aqua" in match_entities(cfg, "Cargill expands salmon feed capacity")
     assert "skretting" in match_entities(cfg, "Skretting launches new feed")
+    assert match_entities(cfg, "Hederspris til Herman Skretting") == []  # surname
+    assert match_entities(cfg, "Skretting moves to new roadmap", domain="intrafish.com") == ["skretting"]  # trade outlet
+    assert match_entities(cfg, "Skretting investerer i nytt fôrlager") == ["skretting"]  # compound word
 
 
 def test_google_news_parse():
@@ -183,7 +186,7 @@ def test_claude_refusal_falls_back_to_lexicon(cfg, monkeypatch):
 def test_store_roundtrip_and_build(cfg, tmp_path, monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     st = Store(tmp_path / "data")
-    mentions, _ = merge_raw(cfg, {}, [raw("BioMar results beat expectations"), raw("Skretting expands in Vietnam", hours_ago=30)])
+    mentions, _ = merge_raw(cfg, {}, [raw("BioMar results beat expectations"), raw("Skretting expands shrimp feed in Vietnam", hours_ago=30)])
     analysis.analyse(cfg, mentions)
     st.save(mentions)
     assert len(st.load_all()) == 2
@@ -202,3 +205,21 @@ def test_store_roundtrip_and_build(cfg, tmp_path, monkeypatch):
     assert json.loads(crypto.decrypt(env, "s3cret"))["brand"] == "biomar"
     with pytest.raises(Exception):
         crypto.decrypt(env, "wrong")
+
+
+def test_search_match_attribution(cfg):
+    from monitor.matching import attribute
+    football = raw("Rosenborg-kvinnene tok poeng på Lerkendal")
+    football.query_entity = "skretting"
+    assert attribute(cfg, football) == ([], "headline")
+    generic = raw("Pareto analyst recommends feed producer")
+    generic.query_entity = "biomar"
+    assert attribute(cfg, generic) == (["biomar"], "search")
+    # Headline names the entity but it's a namesake/excluded use -> dropped, not trusted.
+    namesake = raw("Rede Biomar mobiliza voluntários")
+    namesake.query_entity = "biomar"
+    assert attribute(cfg, namesake) == ([], "headline")
+    # Executive found via search also counts for the brand.
+    ex = raw("Interview: why feed prices matter")
+    ex.query_entity = "carlos-diaz"
+    assert attribute(cfg, ex) == (["biomar", "carlos-diaz"], "search")
