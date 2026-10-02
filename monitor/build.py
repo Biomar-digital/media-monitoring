@@ -21,6 +21,7 @@ from .store import Store
 DASHBOARD_SRC = ROOT / "dashboard"
 SITE_DIR = ROOT / "site"
 HISTORY_DAYS: int | None = None  # None = everything on record
+NEUTRAL_ORIGINS = {"sitemap", "rss", "sweep"}
 
 
 def _brand_only_via_executive(cfg: Config, m) -> bool:
@@ -54,9 +55,11 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             "mb": m.matched_by,
             "v": m.verified,
             "k": cfg.kind_of(m.title, m.source, m.source_domain),
-            # Comparable: found by this tracker's own collection, which searches every company
-            # the same way. Import-only rows come from a BioMar-only tracker.
-            "cmp": m.origins != ["import"],
+            # Comparable (like-for-like): found by a source that reads everything an outlet
+            # publishes (sitemap, RSS, site sweep), so every company is measured against the same
+            # articles regardless of how often it's searched; and the company is named in the
+            # headline or confirmed in the body (unverified full-text matches are too noisy).
+            "cmp": bool(set(m.origins) & NEUTRAL_ORIGINS) and (m.matched_by == "headline" or m.verified == "body"),
             "bx": _brand_only_via_executive(cfg, m),
         }
         for m in mentions
@@ -70,7 +73,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
         # Earliest article on record: comparisons with periods before this would be fake.
         "tracking_since": min((m.published for m in mentions), default=None),
         # Imported history covers BioMar only; competitors are tracked from the first collected article.
-        "competitors_since": min((m.published for m in mentions if "import" not in m.origins), default=None),
+        "comparable_since": min((m.published for m in mentions if set(m.origins) & NEUTRAL_ORIGINS), default=None),
         "analysis_methods": dict(Counter(m.analysis for m in mentions)),
         "briefings": store.latest_briefings(14),
         "mentions": rows,

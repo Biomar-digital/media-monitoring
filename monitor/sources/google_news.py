@@ -155,6 +155,8 @@ def sweep(sites: list[tuple], days: int = 2, delay: float = 1.0) -> list[RawArti
     with http.client() as c:
         for domain, country, lang in sites:
             found = _window(c, f"site:{domain}", (country, lang), days, delay)
+            for a in found:
+                a.origin = "sweep"
             log.debug("sweep %s: %d", domain, len(found))
             results.extend(found)
     return results
