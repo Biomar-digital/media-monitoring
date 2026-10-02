@@ -36,7 +36,9 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
         log.info("google_news: %d results", len(found))
         raws += found
     if "gdelt" in sources:
-        found = gdelt.search(queries, timespan=f"{window_days}d")
+        # GDELT's OR groups only accept simple terms, so search each entity's primary alias.
+        terms = list(dict.fromkeys(f'"{e.aliases[0] if e.aliases else e.name}"' for e in cfg.entities))
+        found = gdelt.search(terms, timespan=f"{window_days}d")
         log.info("gdelt: %d results", len(found))
         raws += found
     if "rss" in sources and cfg.rss_feeds:

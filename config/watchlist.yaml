@@ -139,7 +139,7 @@ topics:
   - Other
 
 # Google News editions to search, i.e. "what the world is saying" in local languages.
-# Format: country code, language code. Chosen to cover BioMar's main markets.
+# Format: [country code, edition language, optional UI language when it differs]. Chosen to cover BioMar's main markets.
 google_news_editions:
   - [US, en]
   - [GB, en]
@@ -152,12 +152,12 @@ google_news_editions:
   - [CL, es-419]
   - [EC, es-419]
   - [MX, es-419]
-  - [BR, pt-419]
+  - [BR, pt-419, pt-BR]
   - [FR, fr]
   - [TR, tr]
   - [GR, el]
   - [VN, vi]
-  - [CN, zh-Hans]
+  - [CN, zh-Hans, zh-CN]
   - [ID, id]
 
 # Trade press feeds scanned in full; items are kept only if they mention a watched entity.

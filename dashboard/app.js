@@ -374,9 +374,10 @@
     for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
     return 10 * p;
   }
+  // Counts are whole numbers, so pick a step count that divides the max evenly.
   function ticks(max) {
-    const n = max <= 4 ? max : 4;
-    return Array.from({ length: n + 1 }, (_, i) => Math.round((max / n) * i * 100) / 100);
+    const n = max <= 5 ? max : [4, 5, 3, 2].find((k) => Number.isInteger(max / k)) || 4;
+    return Array.from({ length: n + 1 }, (_, i) => Math.round((max / n) * i));
   }
   // Bar path with a 4px rounded data end and a square baseline end.
   function hbarPath(x0, y, w, hgt, r = 4) {
@@ -567,7 +568,13 @@
       if (ev.key === "ArrowRight") { show(idx + 1); ev.preventDefault(); }
     });
     const legend = h("div", { class: "legend" }, data.map((d) => h("span", { class: "key" }, h("span", { class: "ln", style: `background:${colorOf(d.id)}` }), ENT[d.id].name)));
-    el.replaceChildren(svg, legend);
+    // Table view: every plotted value is reachable without hovering.
+    const table = h("details", { class: "older small" }, h("summary", { text: "Show as table" }),
+      h("div", { class: "table-wrap" }, h("table", {},
+        h("thead", {}, h("tr", {}, h("th", { text: "Period" }), data.map((d) => h("th", { class: "num", text: ENT[d.id].name })))),
+        h("tbody", {}, Array.from({ length: B.n }, (_, i) => B.n - 1 - i).map((i) =>
+          h("tr", {}, h("td", { text: B.label(i) }), data.map((d) => h("td", { class: "num", text: nf.format(d.v[i]) }))))))));
+    el.replaceChildren(svg, legend, table);
   }
 
   // ---------------------------------------------------------------------------------

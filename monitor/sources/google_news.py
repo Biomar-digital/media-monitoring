@@ -41,8 +41,8 @@ def _strip_html(s: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
-def parse_feed(xml_text: str, edition: tuple[str, str]) -> list[RawArticle]:
-    country, lang = edition
+def parse_feed(xml_text: str, edition: tuple) -> list[RawArticle]:
+    country, lang = edition[0], edition[1]
     out: list[RawArticle] = []
     try:
         root = ET.fromstring(xml_text)
@@ -90,16 +90,17 @@ def parse_feed(xml_text: str, edition: tuple[str, str]) -> list[RawArticle]:
     return out
 
 
-def search(queries: list[str], editions: list[tuple[str, str]], window: str = "2d", delay: float = 1.0) -> list[RawArticle]:
+def search(queries: list[str], editions: list[tuple], window: str = "2d", delay: float = 1.0) -> list[RawArticle]:
     """Run every query in every edition. `window` uses Google's when: operator (e.g. 1d, 7d)."""
     results: list[RawArticle] = []
     with http.client() as c:
         for q in queries:
             for edition in editions:
-                country, lang = edition
+                # (country, edition language[, UI language]) e.g. (BR, pt-419, pt-BR)
+                country, lang = edition[0], edition[1]
                 params = {
                     "q": f"{q} when:{window}",
-                    "hl": lang,
+                    "hl": edition[2] if len(edition) > 2 else lang,
                     "gl": country,
                     "ceid": f"{country}:{lang}",
                 }
