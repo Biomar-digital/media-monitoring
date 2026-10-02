@@ -75,7 +75,7 @@
     feed: { entity: "", tone: "", q: "", page: 0 },
   };
   const PAGE = 25;
-  const MIN_SOV = 50;  // like-for-like articles needed before showing share-of-voice percentages
+  const MIN_SOV = 50;  // below this many like-for-like articles, shares carry a small-sample warning
 
   const colorOf = (id) => {
     const e = ENT[id];
@@ -320,7 +320,7 @@
     const sc = countBy(comparable(cur), ids), spc = prev ? countBy(comparable(prev), ids) : null;
     const total = ids.reduce((a, i) => a + sc[i], 0);
     const ptotal = spc ? ids.reduce((a, i) => a + spc[i], 0) : 0;
-    const sov = total >= MIN_SOV ? sc[bid] / total : 0;
+    const sov = total ? sc[bid] / total : 0;
     const psov = spc && ptotal ? spc[bid] / ptotal : null;
     const tone = toneBy(cur, bid), ptone = prev ? toneBy(prev, bid) : null;
     const execIds = ofType("executive").map((e) => e.id);
@@ -337,9 +337,9 @@
         sparkline(cur, bid)),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Share of voice" }),
-        h("div", { class: "value", text: total >= MIN_SOV ? pct(sov) : "–" }),
+        h("div", { class: "value", text: total ? pct(sov) : "–" }),
         total < MIN_SOV
-          ? h("div", { class: "delta", text: `Not enough like-for-like data yet (${total} articles)` })
+          ? h("div", { class: "delta", text: total ? `Small sample: ${nf.format(total)} like-for-like articles` : "No like-for-like articles in this period" })
           : ptotal >= MIN_SOV
             ? delta(Math.round(sov * 100), Math.round(psov * 100), { unit: " pts" })
             : h("div", { class: "delta", text: `Based on ${nf.format(total)} like-for-like articles` })),
@@ -483,12 +483,13 @@
     const rows = ids.map((id) => ({
       id, label: ENT[id].name, value: c[id],
       color: id === brandId() ? "var(--series-1)" : "var(--de-emph)",
-      valueText: enough ? pct(c[id] / total) : nf.format(c[id]),
-      tip: [...(enough ? [{ k: "Share of voice", v: pct(c[id] / total) }] : []), { k: "Articles", v: nf.format(c[id]) }],
+      valueText: total ? `${pct(c[id] / total)} (${nf.format(c[id])})` : "0",
+      tip: [{ k: "Share of voice", v: total ? pct(c[id] / total) : "–" }, { k: "Articles", v: nf.format(c[id]) }],
     })).sort((a, b) => b.value - a.value);
     if (total) hbars($("sovChart"), rows, { highlight: brandId() }); else empty($("sovChart"), "No like-for-like articles in this period yet.");
     $("sovChart").append(h("p", { class: "note small", text:
-      (enough ? `Based on ${nf.format(total)} articles. ` : `Only ${nf.format(total)} like-for-like articles in this period, too few for a reliable share; counts shown instead (a share needs at least ${MIN_SOV}). `) +
+      `Based on ${nf.format(total)} articles (article counts in brackets). ` +
+      (enough ? "" : `Small sample: with fewer than ${MIN_SOV} articles a single story moves these shares a lot, so read them as indicative. `) +
       "Like-for-like means articles from sources that read everything an outlet publishes (publisher sitemaps, RSS feeds, trade-site sweeps), " +
       "where the headline names the company or the article text confirms it. Search results are left out, because how often a company is searched skews them, " +
       "and so are imported BioMar history and executive-only articles." }));
