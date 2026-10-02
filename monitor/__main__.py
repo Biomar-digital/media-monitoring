@@ -52,6 +52,17 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
         found = google_news.search(queries, cfg.google_news_editions, days=window_days, local_queries=local_queries)
         log.info("google_news: %d results", len(found))
         raws += found
+        if cfg.country_domain_searches:
+            # e.g. "BioMar" site:dk through the US edition (Google has no Danish edition).
+            found = []
+            for tld, country, lang in cfg.country_domain_searches:
+                qs = [(e.id, f'"{e.aliases[0] if e.aliases else e.name}" site:{tld}')
+                      for e in cfg.entities if e.type != "executive"]
+                found += google_news.search(qs, [(country, lang)], days=window_days)
+            for a in found:
+                a.country = google_news.country_from_domain(a.source_domain) or a.country
+            log.info("country-domain searches: %d results", len(found))
+            raws += found
         if cfg.site_sweeps:
             found = google_news.sweep(cfg.site_sweeps, days=window_days)
             log.info("site sweeps: %d articles scanned", len(found))

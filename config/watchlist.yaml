@@ -238,6 +238,15 @@ local_search_terms:
   zh: [饲料, 水产]
   id: [pakan, udang]
 
+# Markets with no Google News edition: search each brand/competitor restricted to that
+# country's web domain, via an edition that indexes it (the US edition indexes .dk/.is/.cr).
+# Format: [top-level domain, edition country, edition language]
+country_domain_searches:
+  - [dk, US, en]
+  - [is, US, en]
+  - [cr, US, en]
+  - [ec, US, en]
+
 # Site sweeps: everything a trade publication published recently (via Google News), then
 # filtered by the watchlist. For major trade outlets without a usable RSS feed.
 # Format: [domain, edition country, edition language]
