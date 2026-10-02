@@ -69,7 +69,6 @@
   let ENT = {};          // id -> entity
   const state = {
     days: Number(store.get("mm.days")) || 30,
-    fulltext: store.get("mm.fulltext") === "1",
     region: "",
     trend: null,         // Set of entity ids shown in the trend chart (null = auto)
     feed: { entity: "", tone: "", q: "", page: 0 },
@@ -150,7 +149,7 @@
     const span = state.days * DAY;
     const to = now() - offsetPeriods * span;
     const from = to - span;
-    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || (m.c || "") === state.region) && (state.fulltext || m.mb !== "search"));
+    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || (m.c || "") === state.region));
   }
   const ofType = (t) => DATA.entities.filter((e) => e.type === t);
   const brandId = () => DATA.brand;
@@ -182,9 +181,6 @@
         renderAll();
       });
     }
-    const ft = $("fulltextChk");
-    ft.checked = state.fulltext;
-    ft.addEventListener("change", () => { state.fulltext = ft.checked; store.set("mm.fulltext", ft.checked ? "1" : "0"); state.feed.page = 0; renderAll(); });
     const countries = [...new Set(DATA.mentions.map((m) => m.c || ""))];
     countries.sort((a, b) => countryName(a).localeCompare(countryName(b)));
     const sel = $("regionSel");
@@ -216,8 +212,7 @@
     const methods = DATA.analysis_methods || {};
     const lex = methods.lexicon || 0;
     $("foot").textContent =
-      `Sources: Google News (18 regional editions), GDELT and trade-press RSS. ` +
-      (state.fulltext ? "" : "Showing articles whose headline names a company; tick “Include full-text matches” for broader coverage. ") +
+      `Sources: Google News (17 regional editions), GDELT and trade-press RSS. Includes articles where the company appears in the text but not the headline (marked “Full-text match”). ` +
       `Sentiment and topics are AI-assessed from headlines and snippets` +
       (lex ? `; ${nf.format(lex)} articles were scored by the keyword fallback because no Claude API key was configured.` : ".");
   }

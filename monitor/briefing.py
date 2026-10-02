@@ -94,11 +94,7 @@ def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = N
         "counts_prev_7d": _counts(cfg, prev7),
     }
     if not claude_available() or not today:
-        # Without Claude to judge them, full-text-only matches are too noisy to summarise.
-        def named(ms):
-            return [m for m in ms if m.matched_by == "headline"]
-
-        return {**base, **_fallback(cfg, named(today), named(prev7)), "method": "automatic"}
+        return {**base, **_fallback(cfg, today, prev7), "method": "automatic"}
 
     import anthropic
 
@@ -141,5 +137,4 @@ def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = N
         return {**base, **out, "method": "claude"}
     except (anthropic.APIError, ValueError, StopIteration) as exc:
         log.warning("Briefing via Claude failed (%s); using automatic briefing", exc)
-        named = [m for m in today if m.matched_by == "headline"]
-        return {**base, **_fallback(cfg, named, [m for m in prev7 if m.matched_by == "headline"]), "method": "automatic"}
+        return {**base, **_fallback(cfg, today, prev7), "method": "automatic"}

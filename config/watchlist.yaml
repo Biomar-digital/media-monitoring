@@ -169,7 +169,9 @@ topics:
   - Other
 
 # Google News editions to search, i.e. "what the world is saying" in local languages.
-# Format: [country code, edition language, optional UI language when it differs]. Chosen to cover BioMar's main markets.
+# Format: [country code, edition language, optional UI language when it differs].
+# English editions get en-<country> automatically. Google News has no Danish or Ecuadorian
+# edition (they return nothing), so Danish coverage comes via GDELT and the other editions. Chosen to cover BioMar's main markets.
 google_news_editions:
   - [US, en]
   - [GB, en]
@@ -177,10 +179,9 @@ google_news_editions:
   - [CA, en]
   - [IN, en]
   - [NO, "no"]
-  - [DK, da]
   - [ES, es]
   - [CL, es-419]
-  - [EC, es-419]
+  - [PE, es-419]
   - [MX, es-419]
   - [BR, pt-419, pt-BR]
   - [FR, fr]

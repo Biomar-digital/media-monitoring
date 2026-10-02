@@ -94,7 +94,6 @@ a { color: inherit; }
   border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; min-width: 0;
 }
 .select.grow { flex: 1 1 180px; }
-.check-inline { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
 .select.grow input { width: 100%; }
 button.ghost { font: inherit; font-size: 13px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
 button.ghost:hover { background: var(--surface-2); }

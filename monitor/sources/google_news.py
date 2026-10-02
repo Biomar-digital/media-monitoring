@@ -12,7 +12,7 @@ import logging
 import re
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
 
@@ -90,26 +90,54 @@ def parse_feed(xml_text: str, edition: tuple) -> list[RawArticle]:
     return out
 
 
-def search(queries: list[tuple[str, str]], editions: list[tuple], window: str = "2d", delay: float = 1.0) -> list[RawArticle]:
-    """Run every (entity_id, query) in every edition. `window` uses Google's when: operator (e.g. 1d, 7d)."""
+MAX_RESULTS = 100  # Google News RSS never returns more than this per request
+
+
+def ui_language(edition: tuple) -> str:
+    """The hl= parameter. English editions need the regional form (en-US, en-GB): plain
+    "en" silently returns zero results. Others use the edition language unless overridden."""
+    country, lang = edition[0], edition[1]
+    if len(edition) > 2:
+        return edition[2]
+    return f"en-{country}" if lang == "en" else lang
+
+
+def _fetch(c, q: str, edition: tuple) -> list[RawArticle] | None:
+    country, lang = edition[0], edition[1]
+    params = {"q": q, "hl": ui_language(edition), "gl": country, "ceid": f"{country}:{lang}"}
+    r = http.get(c, SEARCH_URL, params=params)
+    return parse_feed(r.text, edition) if r is not None else None
+
+
+def _range(c, q: str, edition: tuple, start: date, end: date, delay: float) -> list[RawArticle]:
+    """Articles published in [start, end). If Google's 100-result cap is hit, the range is
+    split in half and each half searched, so long backfills aren't silently truncated."""
+    found = _fetch(c, f"{q} after:{start.isoformat()} before:{end.isoformat()}", edition) or []
+    time.sleep(delay)
+    if len(found) >= MAX_RESULTS - 2 and (end - start).days > 1:
+        mid = start + (end - start) / 2
+        return _range(c, q, edition, start, mid, delay) + _range(c, q, edition, mid, end, delay)
+    return found
+
+
+def search(queries: list[tuple[str, str]], editions: list[tuple], days: int = 2, delay: float = 1.0) -> list[RawArticle]:
+    """Run every (entity_id, query) in every edition, covering the last `days` days.
+
+    Short windows use Google's when: operator; longer ones use explicit date ranges that
+    are subdivided whenever a range hits the result cap.
+    """
     results: list[RawArticle] = []
+    today = datetime.now(timezone.utc).date()
     with http.client() as c:
         for entity_id, q in queries:
             for edition in editions:
-                # (country, edition language[, UI language]) e.g. (BR, pt-419, pt-BR)
-                country, lang = edition[0], edition[1]
-                params = {
-                    "q": f"{q} when:{window}",
-                    "hl": edition[2] if len(edition) > 2 else lang,
-                    "gl": country,
-                    "ceid": f"{country}:{lang}",
-                }
-                r = http.get(c, SEARCH_URL, params=params)
-                if r is not None:
-                    found = parse_feed(r.text, edition)
-                    for a in found:
-                        a.query_entity = entity_id
-                    log.debug("google_news %r %s: %d", q, edition, len(found))
-                    results.extend(found)
-                time.sleep(delay)
+                if days <= 3:
+                    found = _fetch(c, f"{q} when:{days}d", edition) or []
+                    time.sleep(delay)
+                else:
+                    found = _range(c, q, edition, today - timedelta(days=days), today + timedelta(days=1), delay)
+                for a in found:
+                    a.query_entity = entity_id
+                log.debug("google_news %r %s: %d", q, edition, len(found))
+                results.extend(found)
     return results

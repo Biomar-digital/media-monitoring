@@ -10,10 +10,11 @@ on:
   workflow_dispatch:
     inputs:
       window_days:
-        description: "How many days back to search (use 30 for a first backfill)"
+        description: "How many days back to search (use 180 for a backfill; 2 is the normal daily window)"
         default: "2"
   push:
-    branches: [main]
+    # Redeploy when code or config changes (data commits by the bot don't trigger this).
+    branches: [main, claude/keen-ramanujan-mdakgb]
     paths: ["dashboard/**", "config/**", "monitor/**"]
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
   monitor:
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}

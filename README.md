@@ -51,7 +51,9 @@ The dashboard works in light and dark mode and on phones.
      open the dashboard. Without it the dashboard is published unencrypted, so anyone
      with the URL can read it.
 2. **Enable Pages.** In *Settings → Pages*, set *Source* to **GitHub Actions**.
-3. **Backfill.** In *Actions → Media monitor → Run workflow*, set `window_days` to `30`.
+3. **Backfill.** In *Actions → Media monitor → Run workflow*, set `window_days` to `180`
+   (up to about 365). Long look-backs search Google News one date range at a time and
+   split any range that hits Google's 100-result cap, so older coverage isn't cut off.
    After that, the schedule runs every 6 hours.
 4. Share the Pages URL and the password with the team.
 
@@ -99,7 +101,7 @@ and trade-press feeds. Changes take effect on the next run, with no code changes
 
 | Source | Coverage | Notes |
 |---|---|---|
-| Google News RSS | 18 regional editions in local languages (NO, DK, ES, CL, EC, MX, BR, FR, TR, GR, VN, CN, ID, US, GB, AU, CA, IN) | Google's feed terms allow **personal, non-commercial use**. Have BioMar legal confirm internal use, or replace it with a licensed news API. |
+| Google News RSS | 17 regional editions in local languages (US, GB, AU, CA, IN, NO, ES, CL, PE, MX, BR, FR, TR, GR, VN, CN, ID). Google has no Danish or Ecuadorian edition. | Google's feed terms allow **personal, non-commercial use**. Have BioMar legal confirm internal use, or replace it with a licensed news API. |
 | GDELT DOC 2.0 | Open global news index, 65+ languages | Free and open. Rate-limited, so the collector sends requests slowly. |
 | Trade press RSS | Undercurrent News, FeedNavigator, Global Seafood Alliance | Add more feeds in the watchlist |
 
@@ -114,19 +116,16 @@ SeafoodSource) appear only when Google News or GDELT index them.
 
 ## How the analysis works
 
-- **Matching** (`monitor/matching.py`): every article is labelled by how it was linked to
-  a company:
+- **Matching** (`monitor/matching.py`): an article is linked to a company in one of two ways:
   - *Headline match*: the headline or snippet names the company, after alias,
     exclusion and context rules. For example, people surnamed Skretting and Brazil's
-    "Rede Biomar" are filtered out. These are precise, so the dashboard's metrics count
-    only these by default.
-  - *Full-text match*: the search engine matched the company in the article text but the
+    "Rede Biomar" are filtered out.
+  - *Full-text match*: the search engine found the company in the article text but the
     headline doesn't name it (for example "Pareto analyst recommends feed producer").
     These are kept only when the headline uses aquaculture or feed vocabulary, or the
     publisher is a trade outlet (`industry_context` and `trade_domains` in the
-    watchlist). They add coverage but include passing mentions in sidebars and
-    related-article lists. The **Include full-text matches** filter adds them to every
-    chart, and they are labelled in the article list.
+    watchlist). They're labelled "Full-text match" in the article list, because some are
+    passing mentions in sidebars or related-article lists.
 
   Duplicates across sources and editions are merged into one record per headline and
   publisher domain.

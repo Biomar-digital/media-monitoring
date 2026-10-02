@@ -223,3 +223,25 @@ def test_search_match_attribution(cfg):
     ex = raw("Interview: why feed prices matter")
     ex.query_entity = "carlos-diaz"
     assert attribute(cfg, ex) == (["biomar", "carlos-diaz"], "search")
+
+
+def test_google_news_ui_language():
+    assert google_news.ui_language(("US", "en")) == "en-US"  # plain "en" returns nothing
+    assert google_news.ui_language(("NO", "no")) == "no"
+    assert google_news.ui_language(("BR", "pt-419", "pt-BR")) == "pt-BR"
+
+
+def test_google_news_range_splits_when_capped(monkeypatch):
+    from datetime import date
+    calls = []
+
+    def fake_fetch(c, q, edition):
+        calls.append(q)
+        # Pretend the full 60-day range is capped; any narrower range returns 3 items.
+        n = 100 if "after:2026-01-01 before:2026-03-02" in q else 3
+        return [raw(f"BioMar {len(calls)}-{i}") for i in range(n)]
+
+    monkeypatch.setattr(google_news, "_fetch", fake_fetch)
+    monkeypatch.setattr(google_news.time, "sleep", lambda s: None)
+    out = google_news._range(None, '"BioMar"', ("US", "en"), date(2026, 1, 1), date(2026, 3, 2), 0)
+    assert len(calls) == 3 and len(out) == 6  # capped range discarded, two halves searched
