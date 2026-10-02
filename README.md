@@ -47,7 +47,9 @@ The dashboard works in light and dark mode and on phones.
    - `ANTHROPIC_API_KEY`: a Claude API key from console.anthropic.com. Without it the
      system still runs, but sentiment comes from a basic keyword list, nothing is
      translated, and the briefing is a plain statistical summary.
-   - `DASHBOARD_PASSWORD`: the password the marketing team will use to open the dashboard.
+   - `DASHBOARD_PASSWORD` (optional for now): the password the marketing team will use to
+     open the dashboard. Without it the dashboard is published unencrypted, so anyone
+     with the URL can read it.
 2. **Enable Pages.** In *Settings → Pages*, set *Source* to **GitHub Actions**.
 3. **Backfill.** In *Actions → Media monitor → Run workflow*, set `window_days` to `30`.
    After that, the schedule runs every 6 hours.
@@ -61,9 +63,8 @@ The dashboard is a static site, so access control is layered:
   encrypted with AES-256-GCM (key derived with PBKDF2-SHA256, 600k iterations). The
   browser decrypts it only after the password is entered. Without the password the
   published files show nothing about BioMar's coverage, even if someone finds the URL.
-  `robots.txt` and `noindex` keep it out of search engines. The workflow **refuses to
-  publish** without a password unless you set the repository variable
-  `DASHBOARD_ACCESS_CONTROLLED=true` (see below).
+  `robots.txt` and `noindex` keep it out of search engines. Without the secret, the
+  workflow still publishes but logs a warning.
 - **Recommended for production: single sign-on.** Put the site behind company login so
   access follows BioMar accounts and can be revoked per person:
   - *GitHub Enterprise Cloud:* make the Pages site private (*Settings → Pages →
@@ -71,9 +72,12 @@ The dashboard is a static site, so access control is layered:
   - *Cloudflare Pages + Cloudflare Access* or *Azure Static Web Apps* with Microsoft Entra
     ID: deploy the `site/` folder there and require @biomar.com sign-in.
 
-  Once SSO is in place you can set `DASHBOARD_ACCESS_CONTROLLED=true` and drop the password.
+  Once SSO is in place you can drop the password.
 
-Also keep the **repository itself private**, because `data/` holds the raw coverage.
+Note that while the **repository is public**, `data/` (articles, sentiment scores and
+briefings) is readable in the repo whatever the dashboard setting. Make the repo
+private before the data becomes sensitive. On GitHub's free plan that means hosting the
+dashboard somewhere other than GitHub Pages.
 
 ## Changing what is monitored
 

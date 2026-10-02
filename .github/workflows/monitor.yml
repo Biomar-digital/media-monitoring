@@ -80,11 +80,10 @@ jobs:
         env:
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
         run: |
-          # Refuse to publish unencrypted data unless someone has explicitly said the site
-          # is already behind access control (e.g. private Pages or Cloudflare Access).
-          if [ -z "$DASHBOARD_PASSWORD" ] && [ "${{ vars.DASHBOARD_ACCESS_CONTROLLED }}" != "true" ]; then
-            echo "::error::Set the DASHBOARD_PASSWORD secret (or the DASHBOARD_ACCESS_CONTROLLED variable to 'true'). See README."
-            exit 1
+          # Without a password the dashboard is published unencrypted (readable by anyone with
+          # the URL). Add the DASHBOARD_PASSWORD secret to encrypt it; nothing else changes.
+          if [ -z "$DASHBOARD_PASSWORD" ]; then
+            echo "::warning::DASHBOARD_PASSWORD is not set, so the dashboard is published without a password. See README."
           fi
           python -m monitor build
 
