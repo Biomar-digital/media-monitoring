@@ -33,22 +33,37 @@ def attribute(cfg: Config, raw: RawArticle) -> tuple[list[str], str]:
     """Entities for an article and how they were matched ("headline" or "search").
 
     Headlines name the company only part of the time; the search engine matched the
-    query against the full text. So when the headline doesn't name the queried entity at
-    all, trust the search match, but only if the headline shows aquaculture/feed context
-    or comes from a trade outlet (search engines also match navigation text and sidebars).
-    When the headline names the entity but fails the rules (a namesake, missing context),
-    the article is about something else and is dropped.
+    query against the full text. So when the headline names no watched company at all,
+    trust the search match, but only if the headline shows aquaculture/feed context or
+    comes from a trade outlet (search engines also match navigation text and sidebars).
+    When the headline names a different watched company, the article is about that
+    company: a BioMar search hit on "Skretting moves to new roadmap" is a sidebar mention,
+    not BioMar coverage. When the headline names the queried entity but fails its rules
+    (a namesake, missing context), the article is about something else and is dropped.
     """
     text = f"{raw.title}\n{raw.snippet}"
     if cfg.ignored(raw.title):
         return [], "headline"
     found = match_entities(cfg, text, raw.source_domain)
     q = raw.query_entity
-    if (q and q not in found and q in cfg.entity_ids and cfg.entity(q).full_text_matches
+    if (q and not found and q in cfg.entity_ids and cfg.entity(q).full_text_matches
             and not cfg.entity(q).named_in(text) and cfg.industry_ok(text, raw.source_domain)):
-        merged = _with_brand(cfg, found + [q])
-        return merged, ("headline" if found else "search")
+        return _with_brand(cfg, [q]), "search"
     return found, "headline"
+
+
+def headline_entities(cfg: Config, m: Mention) -> list[str] | None:
+    """For a stored article: the entities its headline supports, or None when the headline
+    names no watched company (a full-text match, left as is)."""
+    # Every watched company the headline names (with the usual alias/context rules), not
+    # just the ones attached: an imported row tagged BioMar may be about Skretting.
+    named = [e for e in match_entities(cfg, m.title, m.source_domain) if cfg.entity(e).type != "executive"]
+    if not named:
+        return None
+    # Executives are rarely in headlines (they come from people-quoted data or executive
+    # searches), so they stay as long as the headline is about BioMar.
+    execs = [e for e in m.entities if e in cfg.entity_ids and cfg.entity(e).type == "executive"] if cfg.brand in named else []
+    return [e for e in cfg.entity_ids if e in named or e in execs]
 
 
 def merge_raw(

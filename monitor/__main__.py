@@ -20,7 +20,7 @@ from .analysis import analyse, claude_available
 from .briefing import make_briefing
 from .build import SITE_DIR, build_site
 from .config import load_config
-from .matching import merge_raw
+from .matching import headline_entities, merge_raw
 from .sources import gdelt, google_news, rss
 from .store import Store
 
@@ -36,6 +36,13 @@ def reclassify(cfg, mentions) -> None:
         del mentions[key]
     for m in mentions.values():
         m.kind = cfg.kind_of(m.title, m.source, m.source_domain)
+        # Drop companies the headline doesn't support when it names another watched company
+        # (e.g. BioMar on "Skretting moves to new roadmap", found via a sidebar mention).
+        keep = headline_entities(cfg, m)
+        if keep is not None and keep != m.entities:
+            m.entities = keep
+            m.sentiment = {e: m.sentiment.get(e, 0.0) for e in keep}
+            m.matched_by = "headline"
 
 
 def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:

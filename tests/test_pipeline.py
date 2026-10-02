@@ -320,3 +320,34 @@ def test_rss_fetch_pages_and_default_country(monkeypatch):
     out = rss.fetch([{"name": "iLaks", "url": "https://ilaks.no/feed/", "pages": 5, "country": "NO"}])
     assert len(out) == 2 and calls == [None, {"paged": 2}, {"paged": 3}]
     assert all(a.country == "NO" for a in out)
+
+
+def test_headline_naming_another_company_wins(cfg):
+    from monitor.matching import attribute, headline_entities
+    a = raw("‘Happy, not satisfied’: Skretting moves to new roadmap", source="IntraFish")
+    a.source_domain = "intrafish.com"
+    a.query_entity = "biomar"  # found by a BioMar search (sidebar mention)
+    assert attribute(cfg, a) == (["skretting"], "headline")
+    from monitor.models import Mention
+    m = Mention.from_raw(raw("Skretting moves to new roadmap"), ["biomar", "skretting"])  # e.g. an imported row tagged BioMar
+    m.source_domain = "intrafish.com"
+    assert headline_entities(cfg, m) == ["skretting"]
+    m.title = "Pareto analyst recommends feed producer"
+    assert headline_entities(cfg, m) is None  # full-text match: left as is
+
+
+def test_headline_cleanup_keeps_executives_on_brand_articles(cfg):
+    from monitor.matching import headline_entities
+    from monitor.models import Mention
+    m = Mention.from_raw(raw("New MD appointed for BioMar UK"), ["biomar", "paddy-campbell"])
+    assert headline_entities(cfg, m) == ["biomar", "paddy-campbell"]
+    m = Mention.from_raw(raw("Skretting names new CEO"), ["biomar", "carlos-diaz", "skretting"])
+    m.source_domain = "intrafish.com"
+    assert headline_entities(cfg, m) == ["skretting"]
+
+
+def test_imported_competitor_headline_not_counted_for_brand(cfg):
+    from monitor.matching import headline_entities
+    from monitor.models import Mention
+    m = Mention.from_raw(raw("Skretting launches new salmon feed"), ["biomar"])  # imported, tagged BioMar
+    assert headline_entities(cfg, m) == ["skretting"]
