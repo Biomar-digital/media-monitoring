@@ -6,6 +6,7 @@ and entity filters respond instantly without a server.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -69,6 +70,13 @@ def build_site(cfg: Config, store: Store, out_dir: Path = SITE_DIR, password: st
     if out_dir.exists():
         shutil.rmtree(out_dir)
     shutil.copytree(DASHBOARD_SRC, out_dir)
+    # Version the script and stylesheet so browsers never pair a new page with a cached old script.
+    index = out_dir / "index.html"
+    html = index.read_text(encoding="utf-8")
+    for asset in ("app.js", "styles.css"):
+        digest = hashlib.sha1((out_dir / asset).read_bytes()).hexdigest()[:10]
+        html = html.replace(f'"{asset}"', f'"{asset}?v={digest}"')
+    index.write_text(html, encoding="utf-8")
     payload = json.dumps(dashboard_payload(cfg, store), ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     data_dir = out_dir / "data"
     data_dir.mkdir(exist_ok=True)

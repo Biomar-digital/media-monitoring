@@ -55,11 +55,11 @@
         <button data-days="0" role="radio">All time</button>
       </div>
       <label class="check-inline" title="Stock-data pages are automatically generated price, ratio and holdings pages (e.g. TradingView). They're labelled in the article list.">
-        <input type="checkbox" id="stockChk"> Include stock-data pages
+        <input type="checkbox" id="stockChk"> Include stock-data pages <span id="stockCount" class="muted"></span>
       </label>
       <label class="select">
         <span>Region</span>
-        <select id="regionSel"><option value="">All regions</option></select>
+        <select id="regionSel"></select>
       </label>
     </div>
 
@@ -110,7 +110,7 @@
     <div class="grid two">
       <section class="card" aria-labelledby="geoTitle">
         <h2 id="geoTitle">Where BioMar is covered</h2>
-        <p class="muted small">BioMar mentions by publisher country</p>
+        <p class="muted small">BioMar mentions by market (publisher country)</p>
         <div id="geoChart" class="chart"></div>
       </section>
       <section class="card" aria-labelledby="topicTitle">

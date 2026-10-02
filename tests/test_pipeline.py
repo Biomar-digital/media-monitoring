@@ -289,3 +289,34 @@ def test_schouw_ignored_unless_biomar_named(cfg):
     assert attribute(cfg, a) == ([], "headline")
     assert cfg.ignored("SCHO: Profit before tax up 36% YoY")
     assert not cfg.ignored("Schouw & Co announces BioMar IPO plans")
+
+
+def test_multilingual_context_and_headline_only(cfg):
+    from monitor.matching import attribute
+    # Cargill's context words now cover Spanish/Norwegian aquaculture vocabulary.
+    assert "cargill-aqua" in match_entities(cfg, "Cargill presenta nueva generación de Nutripec para acuicultura mexicana")
+    # Mowi the salmon farmer is not Mowi Feed.
+    assert "mowi-feed" not in match_entities(cfg, "Mowi slakter mer laks enn ventet")
+    assert "mowi-feed" in match_entities(cfg, "Mowi øker fôrproduksjonen på Valsneset")
+    # Large diversified companies: no full-text-only attribution.
+    a = raw("14.500 laks på rømmen ble til 222 i sluttregnskapet", source="iLaks")
+    a.query_entity = "mowi-feed"
+    assert attribute(cfg, a)[0] == []
+
+
+def test_rss_fetch_pages_and_default_country(monkeypatch):
+    xml = '<rss><channel><item><title>BioMar åpner fabrikk</title><link>https://ilaks.no/a{p}</link></item></channel></rss>'
+    calls = []
+
+    class R:
+        def __init__(self, t): self.text = t
+
+    def fake_get(c, url, params=None, retries=2):
+        calls.append(params)
+        p = (params or {}).get("paged", 1)
+        return R(xml.replace("{p}", str(p)) if p < 3 else "<rss><channel></channel></rss>")
+
+    monkeypatch.setattr(rss.http, "get", fake_get)
+    out = rss.fetch([{"name": "iLaks", "url": "https://ilaks.no/feed/", "pages": 5, "country": "NO"}])
+    assert len(out) == 2 and calls == [None, {"paged": 2}, {"paged": 3}]
+    assert all(a.country == "NO" for a in out)

@@ -153,7 +153,21 @@
     const span = rangeDays() * DAY;
     const to = now() - offsetPeriods * span;
     const from = to - span;
-    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || (m.c || "") === state.region) && (state.stock || m.k !== "stock"));
+    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || regionOf(m.c) === state.region) && (state.stock || m.k !== "stock"));
+  }
+  // Region filter: BioMar's markets, with the rest of Europe grouped and everything else
+  // (no identifiable country, or outside these markets) under Global / international.
+  const MARKETS = [
+    ["", "All regions"], ["INT", "Global / international"], ["NO", "Norway"], ["DK", "Denmark"], ["ES", "Spain"],
+    ["FR", "France"], ["GR", "Greece"], ["TR", "Turkey"], ["EU", "Other Europe"], ["VN", "Vietnam"], ["CN", "China"],
+    ["EC", "Ecuador"], ["CR", "Costa Rica"], ["CL", "Chile"], ["GB", "United Kingdom"], ["AU", "Australia"], ["IS", "Iceland"],
+  ];
+  const NAMED = new Set(MARKETS.map(([k]) => k).filter((k) => k.length === 2));
+  const EUROPE = new Set("AD AL AT BA BE BG BY CH CY CZ DE EE FI FO GI HR HU IE IM IT LI LT LU LV MC MD ME MK MT NL PL PT RO RS RU SE SI SK SM UA VA XK".split(" "));
+  function regionOf(c) {
+    if (c && NAMED.has(c)) return c;
+    if (c && EUROPE.has(c)) return "EU";
+    return "INT";
   }
   const ofType = (t) => DATA.entities.filter((e) => e.type === t);
   const brandId = () => DATA.brand;
@@ -187,10 +201,9 @@
     const sc = $("stockChk");
     sc.checked = state.stock;
     sc.addEventListener("change", () => { state.stock = sc.checked; store.set("mm.stock", sc.checked ? "1" : "0"); state.feed.page = 0; renderAll(); });
-    const countries = [...new Set(DATA.mentions.map((m) => m.c || ""))];
-    countries.sort((a, b) => countryName(a).localeCompare(countryName(b)));
     const sel = $("regionSel");
-    for (const c of countries) sel.append(h("option", { value: c, text: countryName(c) }));
+    sel.replaceChildren(...MARKETS.map(([k, label]) => h("option", { value: k, text: label })));
+    sel.value = state.region;
     sel.addEventListener("change", () => { state.region = sel.value; state.feed.page = 0; renderAll(); });
 
     const fe = $("feedEntity");
@@ -207,7 +220,16 @@
     $("feedCsv").addEventListener("click", downloadCsv);
   }
 
+  function renderStockCount() {
+    // How many stock-data pages fall in the current range/region, so the switch's effect is visible.
+    const keep = state.stock;
+    state.stock = true;
+    const n = slice(0).filter((m) => m.k === "stock").length;
+    state.stock = keep;
+    $("stockCount").textContent = `(${nf.format(n)} in this period)`;
+  }
   function renderAll() {
+    renderStockCount();
     for (const b of $("rangeSeg").querySelectorAll("button")) b.setAttribute("aria-checked", String(Number(b.dataset.days) === state.days));
     renderBriefing();
     renderTiles();
@@ -603,13 +625,10 @@
   function brandSlice() { return slice(0).filter((m) => m.e.includes(brandId())); }
   function renderGeo() {
     const c = {};
-    for (const m of brandSlice()) c[m.c || ""] = (c[m.c || ""] || 0) + 1;
-    let rows = Object.entries(c).map(([k, v]) => ({ label: countryName(k), value: v, color: "var(--series-1)", valueText: nf.format(v) }));
+    for (const m of brandSlice()) { const k = regionOf(m.c); c[k] = (c[k] || 0) + 1; }
+    const label = Object.fromEntries(MARKETS);
+    const rows = Object.entries(c).map(([k, v]) => ({ label: label[k] || k, value: v, color: "var(--series-1)", valueText: nf.format(v) }));
     rows.sort((a, b) => b.value - a.value);
-    if (rows.length > 10) {
-      const rest = rows.slice(9).reduce((a, r) => a + r.value, 0);
-      rows = [...rows.slice(0, 9), { label: "Other countries", value: rest, color: "var(--de-emph)", valueText: nf.format(rest) }];
-    }
     hbars($("geoChart"), rows);
   }
   function renderTopics() {

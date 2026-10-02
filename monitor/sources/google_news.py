@@ -120,24 +120,41 @@ def _range(c, q: str, edition: tuple, start: date, end: date, delay: float) -> l
     return found
 
 
-def search(queries: list[tuple[str, str]], editions: list[tuple], days: int = 2, delay: float = 1.0) -> list[RawArticle]:
-    """Run every (entity_id, query) in every edition, covering the last `days` days.
-
-    Short windows use Google's when: operator; longer ones use explicit date ranges that
-    are subdivided whenever a range hits the result cap.
-    """
-    results: list[RawArticle] = []
+def _window(c, q: str, edition: tuple, days: int, delay: float) -> list[RawArticle]:
+    """Short windows use Google's when: operator; longer ones explicit date ranges that are
+    subdivided whenever a range hits the result cap."""
+    if days <= 3:
+        found = _fetch(c, f"{q} when:{days}d", edition) or []
+        time.sleep(delay)
+        return found
     today = datetime.now(timezone.utc).date()
+    return _range(c, q, edition, today - timedelta(days=days), today + timedelta(days=1), delay)
+
+
+def search(queries: list[tuple[str, str]], editions: list[tuple], days: int = 2, delay: float = 1.0,
+           local_queries=None) -> list[RawArticle]:
+    """Run every (entity_id, query) in every edition, covering the last `days` days.
+    `local_queries(edition)` may return extra (entity_id, query) pairs for that edition,
+    e.g. company names with local-language industry words."""
+    results: list[RawArticle] = []
     with http.client() as c:
-        for entity_id, q in queries:
-            for edition in editions:
-                if days <= 3:
-                    found = _fetch(c, f"{q} when:{days}d", edition) or []
-                    time.sleep(delay)
-                else:
-                    found = _range(c, q, edition, today - timedelta(days=days), today + timedelta(days=1), delay)
+        for edition in editions:
+            for entity_id, q in list(queries) + list(local_queries(edition) if local_queries else []):
+                found = _window(c, q, edition, days, delay)
                 for a in found:
                     a.query_entity = entity_id
                 log.debug("google_news %r %s: %d", q, edition, len(found))
                 results.extend(found)
+    return results
+
+
+def sweep(sites: list[tuple], days: int = 2, delay: float = 1.0) -> list[RawArticle]:
+    """Everything recent from each (domain, country, language) trade site. No query entity:
+    the watchlist's headline rules decide what's kept."""
+    results: list[RawArticle] = []
+    with http.client() as c:
+        for domain, country, lang in sites:
+            found = _window(c, f"site:{domain}", (country, lang), days, delay)
+            log.debug("sweep %s: %d", domain, len(found))
+            results.extend(found)
     return results

@@ -68,10 +68,19 @@ def parse_feed(xml_text: str, feed_name: str) -> list[RawArticle]:
 
 
 def fetch(feeds: list[dict]) -> list[RawArticle]:
+    """Read each feed; `pages` > 1 follows WordPress-style ?paged=N, and `country` sets the
+    market for items whose domain doesn't identify one."""
     results: list[RawArticle] = []
     with http.client() as c:
         for f in feeds:
-            r = http.get(c, f["url"], retries=2)
-            if r is not None:
-                results.extend(parse_feed(r.text, f["name"]))
+            for page in range(1, int(f.get("pages", 1)) + 1):
+                r = http.get(c, f["url"], params={"paged": page} if page > 1 else None, retries=2)
+                if r is None:
+                    break
+                items = parse_feed(r.text, f["name"])
+                for a in items:
+                    a.country = a.country or f.get("country")
+                results.extend(items)
+                if not items:
+                    break
     return results

@@ -137,9 +137,16 @@ from April 2026, so the dashboard notes that share of voice is overstated for lo
 
 | Source | Coverage | Notes |
 |---|---|---|
-| Google News RSS | 17 regional editions in local languages (US, GB, AU, CA, IN, NO, ES, CL, PE, MX, BR, FR, TR, GR, VN, CN, ID). Google has no Danish or Ecuadorian edition. | Google's feed terms allow **personal, non-commercial use**. Have BioMar legal confirm internal use, or replace it with a licensed news API. |
-| GDELT DOC 2.0 | Open global news index, 65+ languages | Free and open. Rate-limited, so the collector sends requests slowly. |
-| Trade press RSS | Undercurrent News, FeedNavigator, Global Seafood Alliance | Add more feeds in the watchlist |
+| Google News RSS | 17 regional editions in local languages (US, GB, AU, CA, IN, NO, ES, CL, PE, MX, BR, FR, TR, GR, VN, CN, ID). Every brand and competitor is searched by name, and again with local industry words in each language (`local_search_terms`, e.g. "Skretting" fôr), because local trade press rarely matches English terms. | Google's feed terms allow **personal, non-commercial use**. Have BioMar legal confirm internal use, or replace it with a licensed news API. Google has no Danish, Icelandic, Ecuadorian or Costa Rican edition. |
+| Site sweeps | Everything recently published by key trade outlets without usable feeds: iLaks, Kyst.no, IntraFish (NO/EN), Fiskeribladet, Fish Farming Expert, SalmonBusiness, SeafoodSource, The Fish Site, Aquafeed.com, Feed Strategy, Undercurrent, Salmonexpert, misPeces, AquaHoy (`site_sweeps`). | Catches every headline that names a company, not just search hits |
+| Trade & national RSS | Undercurrent News, FeedNavigator, Global Seafood Alliance, iLaks, iQua, Aqua.cl, Mundo Acuícola, Panorama Acuícola, Fish Farmer; **Denmark**: Børsen, DR Penge, Berlingske, Fiskerforum, TV2 Østjylland | Add more in `rss_feeds` (optional `country`, `pages`) |
+| GDELT DOC 2.0 | Open global news index, 65+ languages (includes Danish, Icelandic, Greek, Turkish) | Free and open; rate-limited, so the collector sends requests slowly |
+
+**Markets on the dashboard:** Global / international, Norway, Denmark, Spain, France, Greece,
+Turkey, Other Europe, Vietnam, China, Ecuador, Costa Rica, Chile, UK, Australia, Iceland. An
+article's market is its publisher's country (from the web domain, or the feed/edition when
+the domain doesn't say). Articles with no identifiable country, or from countries outside
+these markets and Europe (e.g. the US), count as Global / international.
 
 Sources are pluggable (`monitor/sources/`). Adding a commercial feed (Meltwater, NewsAPI.ai,
 Factiva, LexisNexis) or social listening means adding one module that returns

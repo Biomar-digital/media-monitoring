@@ -44,8 +44,8 @@ def attribute(cfg: Config, raw: RawArticle) -> tuple[list[str], str]:
         return [], "headline"
     found = match_entities(cfg, text, raw.source_domain)
     q = raw.query_entity
-    if (q and q not in found and q in cfg.entity_ids and not cfg.entity(q).named_in(text)
-            and cfg.industry_ok(text, raw.source_domain)):
+    if (q and q not in found and q in cfg.entity_ids and cfg.entity(q).full_text_matches
+            and not cfg.entity(q).named_in(text) and cfg.industry_ok(text, raw.source_domain)):
         merged = _with_brand(cfg, found + [q])
         return merged, ("headline" if found else "search")
     return found, "headline"

@@ -20,6 +20,15 @@ def _phrase_pattern(phrases: list[str]) -> re.Pattern | None:
     return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")(?!\w)", re.IGNORECASE)
 
 
+def _prefix_pattern(terms: list[str]) -> re.Pattern | None:
+    """Matches words that START with a term, so Norwegian/Danish compounds count
+    ("fôr" matches "fôrprodusent", "havbruk" matches "havbruksnæringen")."""
+    if not terms:
+        return None
+    alts = sorted((re.escape(t) for t in terms), key=len, reverse=True)
+    return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")", re.IGNORECASE)
+
+
 @dataclass
 class Entity:
     id: str
@@ -33,11 +42,13 @@ class Entity:
     color_slot: int | None = None
     # Name is also a common word/surname: headline matches must show industry context too.
     needs_industry_context: bool = False
+    # False: only count articles whose headline names the company (no full-text matches).
+    full_text_matches: bool = True
 
     def __post_init__(self) -> None:
         self._alias_re = _phrase_pattern(self.aliases or [self.name])
         self._exclude_re = _phrase_pattern(self.exclude)
-        self._context_re = _phrase_pattern(self.require_context)
+        self._context_re = _prefix_pattern(self.require_context)
 
     def named_in(self, text: str) -> bool:
         """True if any alias appears, even if exclusion/context rules then reject it."""
@@ -66,15 +77,6 @@ class Entity:
         }
 
 
-def _prefix_pattern(terms: list[str]) -> re.Pattern | None:
-    """Matches words that START with a term, so Norwegian/Danish compounds count
-    ("fôr" matches "fôrprodusent", "havbruk" matches "havbruksnæringen")."""
-    if not terms:
-        return None
-    alts = sorted((re.escape(t) for t in terms), key=len, reverse=True)
-    return re.compile(r"(?<!\w)(?:" + "|".join(alts) + r")", re.IGNORECASE)
-
-
 @dataclass
 class Config:
     brand: str
@@ -86,6 +88,8 @@ class Config:
     trade_domains: list[str] = field(default_factory=list)
     stock_data: dict = field(default_factory=dict)
     ignore_unless_brand_named: list[str] = field(default_factory=list)
+    local_search_terms: dict = field(default_factory=dict)
+    site_sweeps: list = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._industry_re = _prefix_pattern(self.industry_context)
@@ -151,4 +155,6 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> Config:
         trade_domains=raw.get("trade_domains", []),
         stock_data=raw.get("stock_data", {}),
         ignore_unless_brand_named=raw.get("ignore_unless_brand_named", []),
+        local_search_terms=raw.get("local_search_terms", {}),
+        site_sweeps=[tuple(x) for x in raw.get("site_sweeps", [])],
     )

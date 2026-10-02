@@ -11,7 +11,10 @@
 #   aliases          case-insensitive whole-word patterns; an article must match one
 #                    of these to be attributed to the entity
 #   exclude          patterns that disqualify a match (homonyms, unrelated companies)
-#   require_context  for common names: the article must ALSO mention one of these
+#   require_context  for common names: the article must ALSO contain one of these word
+#                    prefixes (any language), e.g. "fôr" also matches "fôrfabrikk"
+#   full_text_matches  false = only count articles whose headline names the company
+#                    (for large diversified companies whose names appear everywhere)
 #   color_slot       fixed chart colour (1-8). Colour follows the entity, never its rank.
 
 brand: biomar
@@ -89,16 +92,21 @@ entities:
     type: competitor
     color_slot: 3
     queries: ['"Cargill" aquaculture feed', '"Cargill Aqua Nutrition"', '"EWOS"']
-    aliases: ["Cargill Aqua Nutrition", "Cargill Aqua", "EWOS", "Cargill"]
-    require_context: ["aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fish farm"]
+    aliases: ["Cargill Aqua Nutrition", "Cargill Aqua", "EWOS", "Cargill", "Nutripec"]
+    require_context: [aquacult, aquafeed, "fish feed", salmon, shrimp, "fish farm", aqua, EWOS, Nutripec,
+                      acuicult, aquicult, salmón, camarón, langostino, camarão, piensos acuícolas,
+                      havbruk, oppdrett, laks, fiskefôr, fôr, opdræt, fiskefoder, tôm, thủy sản, 水产, 鱼饲料]
+    full_text_matches: false
 
   - id: mowi-feed
     name: Mowi Feed
     type: competitor
     color_slot: 4
+    # Mowi is mainly a salmon farmer; only its feed business is a competitor.
     queries: ['"Mowi Feed"', '"Mowi" feed salmon']
     aliases: ["Mowi Feed", "Mowi"]
-    require_context: ["feed"]
+    require_context: [feed, fôr, fiskefôr, pienso, alimento, foder]
+    full_text_matches: false
 
   - id: aller-aqua
     name: Aller Aqua
@@ -120,15 +128,17 @@ entities:
     color_slot: 7
     queries: ['"De Heus" aqua feed', '"De Heus" aquaculture']
     aliases: ["De Heus"]
-    require_context: ["aqua", "fish", "shrimp", "aquaculture"]
+    require_context: [aqua, fish, shrimp, acuicult, camarón, peces, tôm, thủy sản, "thức ăn thủy sản", fisk, 水产]
+    full_text_matches: false
 
   - id: haid-group
     name: Haid Group
     type: competitor
     color_slot: 8
     queries: ['"Haid Group"', '"Guangdong Haid"']
-    aliases: ["Haid Group", "Guangdong Haid", "Haid"]
-    require_context: ["feed", "aquaculture", "shrimp", "fish"]
+    aliases: ["Haid Group", "Guangdong Haid", "Haid", "海大"]
+    require_context: [feed, aquacult, shrimp, fish, 饲料, 水产, 海大集团, tôm, "thức ăn"]
+    full_text_matches: false
 
 # Aquaculture/feed vocabulary (word prefixes, several languages). Used to accept articles
 # that the search engine matched on full text but whose headline doesn't name the company,
@@ -215,7 +225,41 @@ google_news_editions:
   - [CN, zh-Hans, zh-CN]
   - [ID, id]
 
-# Trade press feeds scanned in full; items are kept only if they mention a watched entity.
+# Local-language industry words added to each brand/competitor search in that language's
+# editions (e.g. "Skretting" fôr). Without them, local trade press barely shows up.
+local_search_terms:
+  "no": [fôr, laks]
+  es: [salmón, camarón]
+  pt: [ração, camarão]
+  fr: [aquaculture, aliment]
+  tr: [balık, yem]
+  el: [ιχθυοκαλλιέργεια, ιχθυοτροφές]
+  vi: [tôm, "thức ăn"]
+  zh: [饲料, 水产]
+  id: [pakan, udang]
+
+# Site sweeps: everything a trade publication published recently (via Google News), then
+# filtered by the watchlist. For major trade outlets without a usable RSS feed.
+# Format: [domain, edition country, edition language]
+site_sweeps:
+  - [ilaks.no, NO, "no"]
+  - [kyst.no, NO, "no"]
+  - [intrafish.no, NO, "no"]
+  - [fiskeribladet.no, NO, "no"]
+  - [intrafish.com, US, en]
+  - [fishfarmingexpert.com, GB, en]
+  - [salmonbusiness.com, GB, en]
+  - [seafoodsource.com, US, en]
+  - [thefishsite.com, GB, en]
+  - [aquafeed.com, US, en]
+  - [feedstrategy.com, US, en]
+  - [undercurrentnews.com, US, en]
+  - [salmonexpert.cl, CL, es-419]
+  - [mispeces.com, ES, es]
+  - [aquahoy.com, ES, es]
+
+# Feeds scanned in full; items are kept only if they mention a watched entity.
+# Optional: country (default market when the domain doesn't say), pages (WordPress paging).
 rss_feeds:
   - name: Undercurrent News
     url: https://www.undercurrentnews.com/feed/
@@ -223,3 +267,38 @@ rss_feeds:
     url: https://www.feednavigator.com/arc/outboundfeeds/rss/
   - name: Global Seafood Alliance
     url: https://www.globalseafood.org/feed/
+  - name: iLaks
+    url: https://ilaks.no/feed/
+    country: "NO"
+    pages: 3
+  - name: iQua
+    url: https://iqua.no/feed/
+    country: "NO"
+  - name: Aqua.cl
+    url: https://www.aqua.cl/feed/
+    country: CL
+    pages: 2
+  - name: Mundo Acuícola
+    url: https://www.mundoacuicola.cl/new/feed/
+    country: CL
+  - name: Panorama Acuícola
+    url: https://www.panoramaacuicola.com/feed/
+  - name: Fish Farmer
+    url: https://www.fishfarmermagazine.com/feed/
+    country: GB
+  # Denmark: Google News has no Danish edition, so Danish press is read directly.
+  - name: Børsen
+    url: https://borsen.dk/rss
+    country: DK
+  - name: DR Penge
+    url: https://www.dr.dk/nyheder/service/feeds/penge
+    country: DK
+  - name: Berlingske
+    url: https://www.berlingske.dk/content/rss
+    country: DK
+  - name: Fiskerforum
+    url: https://fiskerforum.dk/feed/
+    country: DK
+  - name: TV2 Østjylland
+    url: https://www.tv2ostjylland.dk/rss
+    country: DK

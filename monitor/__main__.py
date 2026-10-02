@@ -40,11 +40,22 @@ def reclassify(cfg, mentions) -> None:
 
 def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
     queries = [(e.id, q) for e in cfg.entities for q in e.queries]
+
+    def local_queries(edition):
+        # Brand and competitors with local industry words, e.g. "Skretting" fôr.
+        terms = cfg.local_search_terms.get(edition[1].split("-")[0], [])
+        return [(e.id, f'"{e.aliases[0] if e.aliases else e.name}" {t}')
+                for e in cfg.entities if e.type != "executive" for t in terms]
+
     raws = []
     if "google_news" in sources:
-        found = google_news.search(queries, cfg.google_news_editions, days=window_days)
+        found = google_news.search(queries, cfg.google_news_editions, days=window_days, local_queries=local_queries)
         log.info("google_news: %d results", len(found))
         raws += found
+        if cfg.site_sweeps:
+            found = google_news.sweep(cfg.site_sweeps, days=window_days)
+            log.info("site sweeps: %d articles scanned", len(found))
+            raws += found
     if "gdelt" in sources:
         # GDELT's OR groups only accept simple terms, so search each entity's primary alias.
         terms = list(dict.fromkeys(f'"{e.aliases[0] if e.aliases else e.name}"' for e in cfg.entities))
