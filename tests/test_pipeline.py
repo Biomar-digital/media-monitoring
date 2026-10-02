@@ -399,3 +399,8 @@ def test_verify_drops_sidebar_matches(cfg, monkeypatch):
     stats = V.verify(cfg, store, ids)
     assert stats["verified"] == 1 and stats["dropped"] == 1 and stats["dropped_ids"] == [ids[1]]
     assert store[ids[0]].verified == "body" and ids[1] not in store
+
+
+def test_rss_tolerates_leading_whitespace():
+    xml = '﻿  \n<?xml version="1.0"?><rss><channel><item><title>BioMar news</title><link>https://ypaithros.gr/a</link></item></channel></rss>'
+    assert len(rss.parse_feed(xml, "Ypaithros")) == 1

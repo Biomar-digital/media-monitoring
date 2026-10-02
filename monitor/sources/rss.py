@@ -29,6 +29,7 @@ def _parse_date(s: str | None) -> datetime:
 
 
 def parse_feed(xml_text: str, feed_name: str) -> list[RawArticle]:
+    xml_text = xml_text.lstrip("\ufeff \t\r\n")  # some feeds have a BOM/whitespace before <?xml
     try:
         root = ET.fromstring(xml_text)
     except ET.ParseError as exc:
@@ -80,6 +81,7 @@ def fetch(feeds: list[dict]) -> list[RawArticle]:
                 items = parse_feed(r.text, f["name"])
                 for a in items:
                     a.country = a.country or f.get("country")
+                    a.language = a.language or f.get("language")
                 results.extend(items)
                 if not items:
                     break

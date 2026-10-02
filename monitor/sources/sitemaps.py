@@ -52,6 +52,7 @@ def url_text(url: str) -> str:
 
 
 def parse_news_sitemap(xml_text: str, site: dict) -> list[RawArticle]:
+    xml_text = xml_text.lstrip("\ufeff \t\r\n")
     try:
         root = ET.fromstring(xml_text.encode("utf-8") if isinstance(xml_text, str) else xml_text)
     except ET.ParseError as exc:
@@ -75,6 +76,7 @@ def parse_news_sitemap(xml_text: str, site: dict) -> list[RawArticle]:
 
 
 def parse_url_sitemap(xml_text: str) -> list[tuple[str, datetime | None]]:
+    xml_text = xml_text.lstrip("\ufeff \t\r\n")
     try:
         root = ET.fromstring(xml_text.encode("utf-8") if isinstance(xml_text, str) else xml_text)
     except ET.ParseError:
@@ -95,7 +97,7 @@ def fetch(sites: list[dict], days: int, candidate: Callable[[str], str | None],
     results: list[RawArticle] = []
     with Fetcher() as f:
         for site in sites:
-            r = f.get(site["url"])
+            r = f.get(site["url"]) or f.get(site["url"])  # one retry (e.g. IntraFish's SSO hop)
             if r is None:
                 log.warning("sitemap unavailable or disallowed: %s", site["url"])
                 continue

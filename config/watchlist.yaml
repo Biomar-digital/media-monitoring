@@ -239,9 +239,9 @@ local_search_terms:
   es: [salmón, camarón]
   pt: [ração, camarão]
   fr: [aquaculture, aliment]
-  tr: [balık, yem]
+  tr: ["balık yemi", "su ürünleri"]
   el: [ιχθυοκαλλιέργεια, ιχθυοτροφές]
-  vi: [tôm, "thức ăn"]
+  vi: ["thức ăn thủy sản", "thức ăn tôm"]
   zh: [饲料, 水产]
   id: [pakan, udang]
 
@@ -269,6 +269,30 @@ sitemaps:
   - {name: Kyst.no, url: "https://www.kyst.no/sitemap.xml", type: urls, country: "NO", language: "no", max_fetch: 150}
   - {name: Fish Farming Expert, url: "https://www.fishfarmingexpert.com/sitemap.xml", type: urls, language: en, max_fetch: 150}
   - {name: Salmonexpert, url: "https://www.salmonexpert.cl/sitemap.xml", type: urls, country: CL, language: es, max_fetch: 150}
+  # Market outlets (researched Oct 2026)
+  - {name: "Capital.gr", url: "https://www.capital.gr/sitemap/googlenews", type: news, country: GR, language: el}
+  - {name: "Oikonomikos Taxydromos", url: "https://www.ot.gr/wp-content/uploads/json/sitemap-news.xml", type: news, country: GR, language: el}
+  - {name: "Insider.gr", url: "https://www.insider.gr/gnews.xml", type: news, country: GR, language: el}
+  - {name: "Agrocapital", url: "https://www.agrocapital.gr/feed/googlenews", type: news, country: GR, language: el}
+  - {name: "Dünya", url: "https://www.dunya.com/export/newsmap", type: news, country: TR, language: tr}
+  - {name: "Ekonomim", url: "https://www.ekonomim.com/newsmap", type: news, country: TR, language: tr}
+  - {name: "Habertürk", url: "https://www.haberturk.com/sitemap-news.xml", type: news, country: TR, language: tr}
+  - {name: "Tép Bạc", url: "https://tepbac.com/sitemap-google-news.xml", type: news, country: VN, language: vi}
+  - {name: "CafeF", url: "https://cafef.vn/google-news-sitemap.xml", type: news, country: VN, language: vi}
+  - {name: "VnEconomy", url: "https://vneconomy.vn/sitemap/google-news.xml", type: news, country: VN, language: vi}
+  - {name: "VnEconomy English", url: "https://en.vneconomy.vn/sitemap/google-news.xml", type: news, country: VN, language: en}
+  - {name: "Viet Nam News", url: "https://vietnamnews.vn/sitemap_news.xml", type: news, country: VN, language: en}
+  - {name: "La Nación", url: "https://www.nacion.com/arc/outboundfeeds/news-sitemap/?outputType=xml", type: news, country: CR, language: es}
+  - {name: "El Financiero CR", url: "https://www.elfinancierocr.com/arc/outboundfeeds/news-sitemap/?outputType=xml", type: news, country: CR, language: es}
+  - {name: "La República CR", url: "https://www.larepublica.net/feeds/sitemaps/news_1.xml", type: news, country: CR, language: es}
+  - {name: "CRHoy", url: "https://crhoy.com/sitemaps/sitemap-news.xml", type: news, country: CR, language: es}
+  - {name: "El Mundo CR", url: "https://elmundo.cr/news-sitemap.xml", type: news, country: CR, language: es}
+  - {name: "El Comercio EC", url: "https://www.elcomercio.com/sitemap-news.xml", type: news, country: EC, language: es}
+  - {name: "Primicias", url: "https://www.primicias.ec/sitemap-google-news.xml", type: news, country: EC, language: es}
+  - {name: "Expreso", url: "https://www.expreso.ec/sitemap-google-news.xml", type: news, country: EC, language: es}
+  - {name: "El Universo", url: "https://www.eluniverso.com/arc/outboundfeeds/news-sitemap/?outputType=xml", type: news, country: EC, language: es}
+  - {name: "Vistazo", url: "https://www.vistazo.com/sitemapforgoogle.xml", type: news, country: EC, language: es}
+  - {name: "Landbrugsavisen", url: "https://landbrugsavisen.dk/sitemap-news.xml", type: news, country: DK, language: da}
 
 # Site sweeps: everything a trade publication published recently (via Google News), then
 # filtered by the watchlist. For major trade outlets without a usable RSS feed.
@@ -289,6 +313,10 @@ site_sweeps:
   - [salmonexpert.cl, CL, es-419]
   - [mispeces.com, ES, es]
   - [aquahoy.com, ES, es]
+  # Sites without a usable feed/sitemap; sweeps only work via the US edition for these.
+  - [nongnghiepmoitruong.vn, US, en]
+  - [icelandreview.com, US, en]
+  - [ekathimerini.com, US, en]
 
 # Feeds scanned in full; items are kept only if they mention a watched entity.
 # Optional: country (default market when the domain doesn't say), pages (WordPress paging).
@@ -334,3 +362,136 @@ rss_feeds:
   - name: TV2 Østjylland
     url: https://www.tv2ostjylland.dk/rss
     country: DK
+
+  # --- Market outlets (researched Oct 2026): Greece, Turkey, Vietnam, Costa Rica, Ecuador, Iceland, Denmark ---
+  - name: Naftemporiki
+    url: "https://www.naftemporiki.gr/feed/"
+    country: GR
+    language: el
+  - name: Newmoney
+    url: "https://www.newmoney.gr/feed/"
+    country: GR
+    language: el
+  - name: Kathimerini
+    url: "https://www.kathimerini.gr/infeeds/rss/nx-rss-feed.xml"
+    country: GR
+    language: el
+  - name: Agronews
+    url: "https://www.agronews.gr/rss"
+    country: GR
+    language: el
+  - name: Ypaithros
+    url: "https://www.ypaithros.gr/feed/"
+    country: GR
+    language: el
+  - name: Aqua Life of Turkey
+    url: "https://www.aqualifeofturkey.com.tr/rss.xml"
+    country: TR
+    language: tr
+  - name: Balık Haber
+    url: "https://www.balikhaber.com/rss/genel-0"
+    country: TR
+    language: tr
+  - name: Yem & Katkı
+    url: "https://www.yemvekatki.com/feed/"
+    country: TR
+    language: tr
+  - name: Anadolu Ajansı Ekonomi
+    url: "https://www.aa.com.tr/tr/rss/default?cat=ekonomi"
+    country: TR
+    language: tr
+  - name: Bloomberg HT
+    url: "https://www.bloomberght.com/rss"
+    country: TR
+    language: tr
+  - name: Tarım Pusulası
+    url: "https://www.tarimpusulasi.com/rss.xml"
+    country: TR
+    language: tr
+  - name: Ticaret Gazetesi
+    url: "https://ticaretgazetesi.com.tr/feed/"
+    country: TR
+    language: tr
+  - name: Thủy sản Việt Nam
+    url: "https://thuysanvietnam.com.vn/feed/"
+    country: VN
+    language: vi
+  - name: Người Nuôi Tôm
+    url: "https://nguoinuoitom.vn/feed/"
+    country: VN
+    language: vi
+  - name: VnExpress Kinh doanh
+    url: "https://vnexpress.net/rss/kinh-doanh.rss"
+    country: VN
+    language: vi
+  - name: Tico Times
+    url: "https://ticotimes.net/feed/"
+    country: CR
+    language: en
+  - name: Cámara Nacional de Acuacultura
+    url: "https://www.cna-ecuador.com/feed/"
+    country: EC
+    language: es
+  - name: Pesca Fácil
+    url: "https://www.pescafacil.com/feed/"
+    language: es
+  - name: 200 mílur (mbl.is)
+    url: "https://www.mbl.is/feeds/200milur/"
+    country: IS
+    language: is
+  - name: mbl.is Viðskipti
+    url: "https://www.mbl.is/feeds/vidskipti/"
+    country: IS
+    language: is
+  - name: RÚV
+    url: "https://www.ruv.is/rss/innlent"
+    country: IS
+    language: is
+  - name: Vísir Viðskipti
+    url: "https://www.visir.is/rss/vidskipti"
+    country: IS
+    language: is
+  - name: Bæjarins besta
+    url: "https://bb.is/feed/"
+    country: IS
+    language: is
+  - name: Austurfrétt
+    url: "https://austurfrett.is/frettir?format=feed&type=rss"
+    country: IS
+    language: is
+  - name: Bændablaðið
+    url: "https://www.bbl.is/rss"
+    country: IS
+    language: is
+  - name: SFS
+    url: "https://www.sfs.is/rss"
+    country: IS
+    language: is
+  - name: Heimildin
+    url: "https://heimildin.is/rss/"
+    country: IS
+    language: is
+  - name: Finans
+    url: "https://feeds.finans.dk/seneste"
+    country: DK
+    language: da
+  - name: Jyllands-Posten
+    url: "https://feeds.jp.dk/jp/seneste"
+    country: DK
+    language: da
+  - name: Fiskeritidende
+    url: "https://fiskeritidende.dk/feed/"
+    country: DK
+    language: da
+  - name: Dansk Akvakultur
+    url: "https://danskakvakultur.dk/feed/"
+    country: DK
+    language: da
+  - name: Via Ritzau
+    url: "https://via.ritzau.dk/rss/releases/latest"
+    country: DK
+    language: da
+  - name: Ingeniøren
+    url: "https://ing.dk/rss"
+    country: DK
+    language: da
