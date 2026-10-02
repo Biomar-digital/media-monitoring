@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BioMar Media Monitor</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="viz-root" id="app">
+  <header class="top">
+    <div class="brandline">
+      <h1>BioMar Media Monitor</h1>
+      <p class="sub" id="updated">Loading…</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
+  </header>
+
+  <!-- Password gate (only shown when the data file is encrypted) -->
+  <section id="gate" class="gate" hidden>
+    <form id="gateForm" class="card gate-card">
+      <h2>Private dashboard</h2>
+      <p class="muted">Enter the team password to view BioMar's media coverage.</p>
+      <label class="sr-only" for="gatePw">Password</label>
+      <input id="gatePw" type="password" autocomplete="current-password" placeholder="Password" required>
+      <label class="check"><input type="checkbox" id="gateRemember"> Remember on this device</label>
+      <button type="submit">Unlock</button>
+      <p class="error" id="gateError" role="alert"></p>
+    </form>
+  </section>
+
+  <main id="main" hidden>
+    <div class="filters" role="toolbar" aria-label="Filters">
+      <div class="seg" id="rangeSeg" role="radiogroup" aria-label="Date range">
+        <button data-days="1" role="radio">24 hours</button>
+        <button data-days="7" role="radio">7 days</button>
+        <button data-days="30" role="radio">30 days</button>
+        <button data-days="90" role="radio">90 days</button>
+        <button data-days="180" role="radio">180 days</button>
+      </div>
+      <label class="select">
+        <span>Region</span>
+        <select id="regionSel"><option value="">All regions</option></select>
+      </label>
+    </div>
+
+    <section class="briefing card" id="briefing" aria-labelledby="briefingTitle"></section>
+
+    <section class="tiles" id="tiles" aria-label="Key figures"></section>
+
+    <div class="grid two">
+      <section class="card" aria-labelledby="sovTitle">
+        <h2 id="sovTitle">Share of voice</h2>
+        <p class="muted small">Share of all brand and competitor mentions in the period</p>
+        <div id="sovChart" class="chart"></div>
+      </section>
+      <section class="card" aria-labelledby="sentTitle">
+        <h2 id="sentTitle">Sentiment by company</h2>
+        <p class="muted small">Share of mentions by tone · net score = % positive − % negative</p>
+        <div id="sentChart" class="chart"></div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="trendTitle">
+      <div class="card-head">
+        <div>
+          <h2 id="trendTitle">Mentions over time</h2>
+          <p class="muted small" id="trendSub">BioMar vs selected competitors</p>
+        </div>
+        <div class="chips" id="trendChips" aria-label="Companies shown"></div>
+      </div>
+      <div id="trendChart" class="chart"></div>
+    </section>
+
+    <div class="grid two">
+      <section class="card" aria-labelledby="execTitle">
+        <h2 id="execTitle">Executives in the news</h2>
+        <div id="execTable"></div>
+      </section>
+      <section class="card" aria-labelledby="attnTitle">
+        <h2 id="attnTitle">Needs attention</h2>
+        <p class="muted small">Negative or high-importance coverage of BioMar and its people</p>
+        <div id="attention" class="list"></div>
+      </section>
+    </div>
+
+    <div class="grid two">
+      <section class="card" aria-labelledby="geoTitle">
+        <h2 id="geoTitle">Where BioMar is covered</h2>
+        <p class="muted small">BioMar mentions by publisher country</p>
+        <div id="geoChart" class="chart"></div>
+      </section>
+      <section class="card" aria-labelledby="topicTitle">
+        <h2 id="topicTitle">What BioMar coverage is about</h2>
+        <p class="muted small">BioMar mentions by topic</p>
+        <div id="topicChart" class="chart"></div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="feedTitle">
+      <div class="card-head">
+        <h2 id="feedTitle">All coverage</h2>
+        <div class="feed-filters">
+          <label class="select"><span>Company</span><select id="feedEntity"></select></label>
+          <label class="select"><span>Tone</span>
+            <select id="feedTone">
+              <option value="">Any tone</option>
+              <option value="positive">Positive</option>
+              <option value="neutral">Neutral</option>
+              <option value="negative">Negative</option>
+            </select>
+          </label>
+          <label class="select grow"><span>Search</span><input id="feedSearch" type="search" placeholder="Headline, publisher…"></label>
+          <button type="button" id="feedCsv" class="ghost">Download CSV</button>
+        </div>
+      </div>
+      <div id="feed"></div>
+      <div class="pager" id="pager"></div>
+    </section>
+
+    <footer class="foot muted small" id="foot"></footer>
+  </main>
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

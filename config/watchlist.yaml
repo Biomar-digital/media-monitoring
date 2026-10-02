@@ -1,0 +1,170 @@
+# BioMar media monitoring watchlist.
+#
+# Everything the collector searches for and how mentions are attributed lives here.
+# Edit this file to add or remove executives or competitors. No code changes needed.
+#
+# Entity fields
+#   id               stable key used in the data files (never rename once data exists)
+#   name             display name on the dashboard
+#   type             brand | executive | competitor
+#   queries          search strings sent to the news sources (Google News syntax)
+#   aliases          case-insensitive whole-word patterns; an article must match one
+#                    of these to be attributed to the entity
+#   exclude          patterns that disqualify a match (homonyms, unrelated companies)
+#   require_context  for common names: the article must ALSO mention one of these
+#   color_slot       fixed chart colour (1-8). Colour follows the entity, never its rank.
+
+brand: biomar
+
+entities:
+  - id: biomar
+    name: BioMar
+    type: brand
+    color_slot: 1
+    queries:
+      - '"BioMar"'
+      - '"BioMar Group"'
+    aliases: ["BioMar", "Bio Mar Group", "BioMar Group", "BIOMAR"]
+    exclude:
+      - "BioMar Microbial"        # unrelated Spanish biotech
+      - "biomarker"
+
+  # --- Executives -----------------------------------------------------------
+  # Source: BioMar Q2 2026 interim report (12 Aug 2026) and biomar.com/our-story/our-structure
+  - id: carlos-diaz
+    name: Carlos Diaz
+    role: CEO
+    type: executive
+    queries: ['"Carlos Diaz" BioMar']
+    aliases: ["Carlos Diaz", "Carlos Díaz"]
+    require_context: ["BioMar", "aquafeed", "fish feed", "aquaculture"]
+
+  - id: claus-eskildsen
+    name: Claus Eskildsen
+    role: CFO
+    type: executive
+    queries: ['"Claus Eskildsen"']
+    aliases: ["Claus Eskildsen"]
+    require_context: ["BioMar", "aquafeed", "aquaculture", "Schouw"]
+
+  - id: jens-bjerg-sorensen
+    name: Jens Bjerg Sørensen
+    role: Chair of the Board
+    type: executive
+    queries: ['"Jens Bjerg Sørensen" BioMar', '"Jens Bjerg Sorensen" BioMar']
+    aliases: ["Jens Bjerg Sørensen", "Jens Bjerg Sorensen"]
+    require_context: ["BioMar", "Schouw", "aquaculture"]
+
+  - id: paddy-campbell
+    name: Paddy Campbell
+    role: VP, Salmon Division
+    type: executive
+    queries: ['"Paddy Campbell" BioMar']
+    aliases: ["Paddy Campbell"]
+    require_context: ["BioMar", "salmon", "aquaculture"]
+
+  - id: sif-rishoj
+    name: Sif Rishøj
+    role: VP, People, Purpose & Communication
+    type: executive
+    queries: ['"Sif Rishøj"']
+    aliases: ["Sif Rishøj", "Sif Rishoj"]
+    require_context: ["BioMar", "aquaculture"]
+
+  # --- Competitors ----------------------------------------------------------
+  - id: skretting
+    name: Skretting
+    type: competitor
+    color_slot: 2
+    queries: ['"Skretting"']
+    aliases: ["Skretting"]
+
+  - id: cargill-aqua
+    name: Cargill Aqua Nutrition
+    type: competitor
+    color_slot: 3
+    queries: ['"Cargill" aquaculture feed', '"Cargill Aqua Nutrition"', '"EWOS"']
+    aliases: ["Cargill Aqua Nutrition", "Cargill Aqua", "EWOS", "Cargill"]
+    require_context: ["aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fish farm"]
+
+  - id: mowi-feed
+    name: Mowi Feed
+    type: competitor
+    color_slot: 4
+    queries: ['"Mowi Feed"', '"Mowi" feed salmon']
+    aliases: ["Mowi Feed", "Mowi"]
+    require_context: ["feed"]
+
+  - id: aller-aqua
+    name: Aller Aqua
+    type: competitor
+    color_slot: 5
+    queries: ['"Aller Aqua"']
+    aliases: ["Aller Aqua"]
+
+  - id: vitapro
+    name: Vitapro
+    type: competitor
+    color_slot: 6
+    queries: ['"Vitapro"', '"Nicovita"']
+    aliases: ["Vitapro", "Nicovita"]
+
+  - id: de-heus
+    name: De Heus
+    type: competitor
+    color_slot: 7
+    queries: ['"De Heus" aqua feed', '"De Heus" aquaculture']
+    aliases: ["De Heus"]
+    require_context: ["aqua", "fish", "shrimp", "aquaculture"]
+
+  - id: haid-group
+    name: Haid Group
+    type: competitor
+    color_slot: 8
+    queries: ['"Haid Group"', '"Guangdong Haid"']
+    aliases: ["Haid Group", "Guangdong Haid", "Haid"]
+    require_context: ["feed", "aquaculture", "shrimp", "fish"]
+
+# Topics Claude assigns to each article (keep the list short and stable so trends are comparable).
+topics:
+  - Financial results & markets
+  - Sustainability & ESG
+  - Product & innovation
+  - Raw materials & supply chain
+  - Fish health & welfare
+  - People & leadership
+  - M&A & partnerships
+  - Regulation & policy
+  - Operations & facilities
+  - Other
+
+# Google News editions to search, i.e. "what the world is saying" in local languages.
+# Format: country code, language code. Chosen to cover BioMar's main markets.
+google_news_editions:
+  - [US, en]
+  - [GB, en]
+  - [AU, en]
+  - [CA, en]
+  - [IN, en]
+  - [NO, "no"]
+  - [DK, da]
+  - [ES, es]
+  - [CL, es-419]
+  - [EC, es-419]
+  - [MX, es-419]
+  - [BR, pt-419]
+  - [FR, fr]
+  - [TR, tr]
+  - [GR, el]
+  - [VN, vi]
+  - [CN, zh-Hans]
+  - [ID, id]
+
+# Trade press feeds scanned in full; items are kept only if they mention a watched entity.
+rss_feeds:
+  - name: Undercurrent News
+    url: https://www.undercurrentnews.com/feed/
+  - name: FeedNavigator
+    url: https://www.feednavigator.com/arc/outboundfeeds/rss/
+  - name: Global Seafood Alliance
+    url: https://www.globalseafood.org/feed/

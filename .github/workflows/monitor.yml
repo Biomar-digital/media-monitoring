@@ -1,0 +1,96 @@
+name: Media monitor
+
+# Collects coverage, analyses it with Claude, writes the daily briefing, commits the
+# data back to the repo and publishes the dashboard. Runs every 6 hours so the dashboard
+# stays current through the day. The briefing is rewritten on each run and covers the
+# trailing 24 hours.
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      window_days:
+        description: "How many days back to search (use 30 for a first backfill)"
+        default: "2"
+  push:
+    branches: [main]
+    paths: ["dashboard/**", "config/**", "monitor/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: media-monitor
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q
+
+  monitor:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+
+      - name: Collect, analyse, brief
+        # Pushes to main only rebuild the site from stored data; scheduled and manual runs collect.
+        if: github.event_name != 'push'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -m monitor collect --window-days "${{ inputs.window_days || '2' }}"
+          python -m monitor analyse
+          python -m monitor brief
+
+      - name: Commit data
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "biomar-media-monitor[bot]"
+          git config user.email "media-monitor@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No new data"
+          else
+            git commit -m "data: media monitor run $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Build dashboard
+        env:
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: |
+          # Refuse to publish unencrypted data unless someone has explicitly said the site
+          # is already behind access control (e.g. private Pages or Cloudflare Access).
+          if [ -z "$DASHBOARD_PASSWORD" ] && [ "${{ vars.DASHBOARD_ACCESS_CONTROLLED }}" != "true" ]; then
+            echo "::error::Set the DASHBOARD_PASSWORD secret (or the DASHBOARD_ACCESS_CONTROLLED variable to 'true'). See README."
+            exit 1
+          fi
+          python -m monitor build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
