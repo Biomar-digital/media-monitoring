@@ -21,12 +21,13 @@ from .briefing import make_briefing
 from .build import SITE_DIR, build_site
 from .config import load_config
 from .matching import headline_entities, merge_raw
-from .sources import gdelt, google_news, rss
+from .verify import verify
+from .sources import gdelt, google_news, rss, sitemaps
 from .store import Store
 
 log = logging.getLogger("monitor")
 
-SOURCES = ("google_news", "gdelt", "rss")
+SOURCES = ("google_news", "gdelt", "rss", "sitemaps")
 
 
 def reclassify(cfg, mentions) -> None:
@@ -45,7 +46,7 @@ def reclassify(cfg, mentions) -> None:
             m.matched_by = "headline"
 
 
-def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
+def cmd_collect(cfg, store: Store, sources: list[str], window_days: int, verify_new: bool = True) -> int:
     queries = [(e.id, q) for e in cfg.entities for q in e.queries]
 
     def local_queries(edition):
@@ -84,7 +85,24 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
         found = rss.fetch(cfg.rss_feeds)
         log.info("rss: %d items scanned", len(found))
         raws += found
+    if "sitemaps" in sources and cfg.sitemaps:
+        def candidate(text):
+            # Same alias/context rules as headlines (so "Mowi" salmon-farming URLs aren't
+            # fetched as Mowi Feed); URLs from trade sites count as industry context.
+            for e in cfg.entities:
+                if e.matches(text):
+                    return e.id
+            return None
+        known = {m.url for m in store.load_all().values()}
+        found = sitemaps.fetch(cfg.sitemaps, days=window_days, candidate=candidate, known_urls=known)
+        log.info("sitemaps: %d articles", len(found))
+        raws += found
+    bodies = {r.key: r.body for r in raws if r.body}
     mentions, new_ids = merge_raw(cfg, store.load_all(), raws, store.load_discarded())
+    if verify_new:
+        vstats = verify(cfg, mentions, new_ids, bodies)
+        store.add_discarded(vstats.pop("dropped_ids"))
+        log.info("verify: %s", vstats)
     reclassify(cfg, mentions)
     store.save(mentions)
     log.info("collect: %d new mentions (%d stored)", len(new_ids), len(mentions))
@@ -115,6 +133,17 @@ def cmd_import(cfg, store: Store, path: str) -> None:
     log.info("import: %s (%d stored)", stats, len(mentions))
 
 
+def cmd_verify(cfg, store: Store, limit: int) -> None:
+    """Check stored, not-yet-verified full-text matches (and resolve their links)."""
+    mentions = store.load_all()
+    ids = [m.id for m in sorted(mentions.values(), key=lambda m: m.published, reverse=True)
+           if m.matched_by == "search" and m.verified is None][:limit]
+    stats = verify(cfg, mentions, ids, max_resolve=limit, max_verify=limit)
+    store.add_discarded(stats.pop("dropped_ids"))
+    store.save(mentions)
+    log.info("verify: %s (%d checked)", stats, len(ids))
+
+
 def cmd_build(cfg, store: Store) -> None:
     out = build_site(cfg, store)
     log.info("built dashboard in %s", out)
@@ -131,7 +160,7 @@ def cmd_serve(port: int) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="monitor", description="BioMar media monitoring")
-    p.add_argument("command", choices=["run", "collect", "analyse", "brief", "build", "serve", "import"])
+    p.add_argument("command", choices=["run", "collect", "verify", "analyse", "brief", "build", "serve", "import"])
     p.add_argument("--file", help="Excel export to import (with the import command)")
     p.add_argument("--sources", default=",".join(SOURCES), help=f"comma list from {SOURCES}")
     p.add_argument("--window-days", type=int, default=2, help="how far back each search looks")
@@ -154,6 +183,9 @@ def main(argv: list[str] | None = None) -> int:
         if not a.file:
             p.error("import needs --file")
         cmd_import(cfg, store, a.file)
+        return 0
+    if a.command == "verify":
+        cmd_verify(cfg, store, a.limit)
         return 0
     if a.command == "serve":
         cmd_serve(a.port)

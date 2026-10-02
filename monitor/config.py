@@ -93,6 +93,7 @@ class Config:
     local_search_terms: dict = field(default_factory=dict)
     site_sweeps: list = field(default_factory=list)
     country_domain_searches: list = field(default_factory=list)
+    sitemaps: list = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._industry_re = _prefix_pattern(self.industry_context)
@@ -166,4 +167,5 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> Config:
         local_search_terms=raw.get("local_search_terms", {}),
         site_sweeps=[tuple(x) for x in raw.get("site_sweeps", [])],
         country_domain_searches=[tuple(x) for x in raw.get("country_domain_searches", [])],
+        sitemaps=raw.get("sitemaps", []),
     )

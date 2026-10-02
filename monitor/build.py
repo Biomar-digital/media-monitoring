@@ -52,6 +52,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             "im": m.importance,
             "a": m.analysis,
             "mb": m.matched_by,
+            "v": m.verified,
             "k": cfg.kind_of(m.title, m.source, m.source_domain),
             # Comparable: found by this tracker's own collection, which searches every company
             # the same way. Import-only rows come from a BioMar-only tracker.

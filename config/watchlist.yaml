@@ -254,6 +254,22 @@ country_domain_searches:
   - [cr, US, en]
   - [ec, US, en]
 
+# Publisher sitemaps: a site's complete list of recent articles (robots.txt is respected).
+#   type news: Google News sitemap with headlines.
+#   type urls: full sitemap; article URLs are pre-filtered for watched names (the URL holds
+#              the slug and, on kyst.no-style sites, editorial company tags) and only those
+#              pages are fetched, at most max_fetch per run.
+sitemaps:
+  - {name: IntraFish, url: "https://www.intrafish.com/sitemap/news.xml", type: news, language: en}
+  - {name: IntraFish Norge, url: "https://www.intrafish.no/sitemap/news.xml", type: news, country: "NO", language: "no"}
+  - {name: Fiskeribladet, url: "https://www.fiskeribladet.no/sitemap/news.xml", type: news, country: "NO", language: "no"}
+  - {name: misPeces, url: "https://www.mispeces.com/google-news-sitemap.xml", type: news, country: ES, language: es}
+  - {name: The Fish Site, url: "https://thefishsite.com/news-sitemap.xml", type: news, language: en}
+  - {name: Berlingske, url: "https://www.berlingske.dk/news-sitemap.xml", type: news, country: DK, language: da}
+  - {name: Kyst.no, url: "https://www.kyst.no/sitemap.xml", type: urls, country: "NO", language: "no", max_fetch: 150}
+  - {name: Fish Farming Expert, url: "https://www.fishfarmingexpert.com/sitemap.xml", type: urls, language: en, max_fetch: 150}
+  - {name: Salmonexpert, url: "https://www.salmonexpert.cl/sitemap.xml", type: urls, country: CL, language: es, max_fetch: 150}
+
 # Site sweeps: everything a trade publication published recently (via Google News), then
 # filtered by the watchlist. For major trade outlets without a usable RSS feed.
 # Format: [domain, edition country, edition language]

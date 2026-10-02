@@ -138,9 +138,25 @@ from April 2026, so the dashboard notes that share of voice is overstated for lo
 | Source | Coverage | Notes |
 |---|---|---|
 | Google News RSS | 17 regional editions in local languages (US, GB, AU, CA, IN, NO, ES, CL, PE, MX, BR, FR, TR, GR, VN, CN, ID). Every brand and competitor is searched by name, and again with local industry words in each language (`local_search_terms`, e.g. "Skretting" fôr), because local trade press rarely matches English terms. | Google's feed terms allow **personal, non-commercial use**. Have BioMar legal confirm internal use, or replace it with a licensed news API. Google has no Danish, Icelandic, Ecuadorian or Costa Rican edition. |
+| Publisher sitemaps | Complete recent article lists, read directly from the publisher (robots.txt respected): news sitemaps of IntraFish (EN/NO), Fiskeribladet, misPeces, The Fish Site and Berlingske; full sitemaps of Kyst.no, Fish Farming Expert and Salmonexpert, whose URLs carry editorial company tags (`sitemaps`). | The most complete free source for these outlets. Only matching pages are fetched (at most `max_fetch` per run). |
 | Site sweeps | Everything recently published by key trade outlets without usable feeds: iLaks, Kyst.no, IntraFish (NO/EN), Fiskeribladet, Fish Farming Expert, SalmonBusiness, SeafoodSource, The Fish Site, Aquafeed.com, Feed Strategy, Undercurrent, Salmonexpert, misPeces, AquaHoy (`site_sweeps`). | Catches every headline that names a company, not just search hits |
 | Trade & national RSS | Undercurrent News, FeedNavigator, Global Seafood Alliance, iLaks, iQua, Aqua.cl, Mundo Acuícola, Panorama Acuícola, Fish Farmer; **Denmark**: Børsen, DR Penge, Berlingske, Fiskerforum, TV2 Østjylland | Add more in `rss_feeds` (optional `country`, `pages`) |
 | GDELT DOC 2.0 | Open global news index, 65+ languages (includes Danish, Icelandic, Greek, Turkish) | Free and open; rate-limited, so the collector sends requests slowly |
+
+**Google News and robots.txt.** news.google.com's robots.txt disallows automated access to
+`/rss/` (search feeds and article links) for all crawlers, on top of the "personal,
+non-commercial use" feed terms. Feed readers use these feeds routinely, but strictly this
+tool's Google News collection doesn't follow that robots.txt. The fetcher used for article
+pages *does* honour robots.txt, which is why Google News links aren't resolved to publisher
+URLs. To run fully within publishers' rules, drop `google_news` from the collection
+sources and rely on sitemaps, RSS and (paid or permitted) APIs.
+
+**Verifying full-text matches.** When a headline names no watched company, the article is
+kept only if the company appears in the article body. Page furniture (menus, sidebars,
+"related" and "most read" lists) is stripped first. Articles from sitemaps and RSS (real
+publisher URLs) are checked automatically; Google News links can't be resolved (see above),
+so those stay "Full-text match (not verified)". `python -m monitor verify --limit N`
+re-checks stored matches.
 
 **Markets on the dashboard:** Global / international, Norway, Denmark, Spain, France, Greece,
 Turkey, Other Europe, Vietnam, China, Ecuador, Costa Rica, Chile, UK, Australia, Iceland. An

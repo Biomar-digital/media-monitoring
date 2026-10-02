@@ -690,7 +690,10 @@
         h("span", { text: countryName(m.c) }),
         h("span", { text: relTime(m.p) }),
         m.k === "stock" ? h("span", { class: "pill stock", title: "Automatically generated stock-data page", text: "Stock data" }) : null,
-        m.mb === "search" ? h("span", { title: "The search engine matched the company in the article text; the headline doesn't name it.", text: "Full-text match" }) : null,
+        m.mb === "search" ? h("span", {
+          title: m.v === "body" ? "The headline doesn't name the company; it was confirmed in the article text."
+            : "The headline doesn't name the company and the article text couldn't be checked (e.g. a Google News link or paywall), so it may be a passing or sidebar mention.",
+          text: m.v === "body" ? "Full-text match ✓ confirmed" : "Full-text match (not verified)" }) : null,
         ...m.e.map((e) => h("span", { class: "pill", text: ENT[e] ? ENT[e].name : e })),
         m.im >= 3 ? h("span", { class: "pill", style: "border-color:var(--critical)" }, h("span", { class: "attn-icon", text: "! " }), "Attention") : null));
   }

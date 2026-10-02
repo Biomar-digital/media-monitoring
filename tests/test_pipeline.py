@@ -357,3 +357,45 @@ def test_possessives_and_ad_banners(cfg):
     assert "cargill-aqua" in match_entities(cfg, "Kolmulen kan snart forsvinne fra fiskefôret. Dette er Cargills plan B.")
     assert cfg.ignored("BioMar SmartCare Assist Skin — 980x300")
     assert not cfg.ignored("BioMar posts record volumes")
+
+
+def test_news_sitemap_parse_and_url_text():
+    from monitor.sources import sitemaps
+    xml = """<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"><url>
+      <loc>https://www.intrafish.no/fôr/biomar-apner-fabrikk/2-1-1</loc>
+      <news:news><news:publication><news:name>IntraFish</news:name><news:language>no</news:language></news:publication>
+      <news:publication_date>2026-10-02T09:36:45Z</news:publication_date><news:title>BioMar åpner fabrikk</news:title></news:news>
+      </url></urlset>"""
+    [a] = sitemaps.parse_news_sitemap(xml, {"name": "IntraFish Norge", "url": "x", "country": "NO"})
+    assert (a.title, a.source_domain, a.country, a.language, a.origin) == ("BioMar åpner fabrikk", "intrafish.no", "NO", "no", "sitemap")
+    assert sitemaps.url_text("https://www.kyst.no/ambienta-biomar-skretting/milliardfond-kjoper/2189431") == "ambienta biomar skretting milliardfond kjoper"
+
+
+def test_body_extraction_skips_sidebars():
+    from monitor.articles import extract
+    html = """<html><head><meta property="og:title" content="Skretting moves to new roadmap"></head><body>
+      <nav><p>BioMar Skretting Cargill</p></nav>
+      <article><p>Skretting announced a new strategy today, focused on growth in shrimp feed and digital tools for farmers across Asia and Latin America.</p>
+      <p>The company said it expects higher volumes next year as markets recover and new mills start production in Ecuador and India.</p>
+      <div class="related-articles"><p>BioMar posts record volumes</p></div></article>
+      <aside><p>Most read: BioMar IPO</p></aside></body></html>"""
+    out = extract(html)
+    assert out["title"] == "Skretting moves to new roadmap"
+    assert "Skretting announced" in out["body"] and "BioMar" not in out["body"]
+
+
+def test_verify_drops_sidebar_matches(cfg, monkeypatch):
+    from monitor import verify as V
+    a, b = raw("Pareto analyst recommends feed producer", source="Finansavisen"), raw("Fish feed prices fall in Norway", source="iLaks")
+    a.query_entity = b.query_entity = "biomar"  # both found by a BioMar search
+    store, ids = merge_raw(cfg, {}, [a, b])
+    for m in store.values():
+        m.matched_by = "search"
+        m.url = "https://example.no/" + m.id
+    texts = {store[ids[0]].url: "Pareto Securities recommends BioMar Group shares. " * 20,
+             store[ids[1]].url: "Feed prices for salmon fell in the third quarter, analysts said. " * 20}
+    monkeypatch.setattr(V, "fetch_article", lambda f, url: {"body": texts[url], "title": "", "description": ""})
+    stats = V.verify(cfg, store, ids)
+    assert stats["verified"] == 1 and stats["dropped"] == 1 and stats["dropped_ids"] == [ids[1]]
+    assert store[ids[0]].verified == "body" and ids[1] not in store

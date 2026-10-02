@@ -38,6 +38,7 @@ class RawArticle:
     language: str | None = None
     origin: str = ""  # which collector found it: google_news | gdelt | rss
     query_entity: str | None = None  # entity whose search query returned this article
+    body: str = ""  # article text when the source already fetched the page (not stored)
 
     @property
     def key(self) -> str:
@@ -74,6 +75,9 @@ class Mention:
     # full-text match links it (e.g. "Pareto recommends feed producer").
     matched_by: str = "headline"
     kind: str = "news"  # news | stock (generated stock-data page)
+    # Full-text matches only: "body" = company confirmed in the article text,
+    # "unverified" = article text couldn't be read (paywall, blocked). None = not checked.
+    verified: str | None = None
     analysis: str = "pending"  # claude | lexicon | imported | pending
 
     @classmethod
