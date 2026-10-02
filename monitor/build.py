@@ -51,6 +51,8 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int = HISTORY_DAY
         "entities": [e.to_public() for e in cfg.entities],
         "topics": cfg.topics,
         "history_days": history_days,
+        # Earliest article on record: comparisons with periods before this would be fake.
+        "tracking_since": min((m.published for m in mentions), default=None),
         "analysis_methods": dict(Counter(m.analysis for m in mentions)),
         "briefings": store.latest_briefings(14),
         "mentions": rows,

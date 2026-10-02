@@ -132,7 +132,8 @@
     ENT = Object.fromEntries(data.entities.map((e) => [e.id, e]));
     for (const m of data.mentions) m._t = new Date(m.p).getTime();
     $("main").hidden = false;
-    $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked over ${data.history_days} days`;
+    const since = data.tracking_since ? ` since ${dateFmt.format(new Date(data.tracking_since))}` : "";
+    $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked${since}`;
     setupFilters();
     renderAll();
     let t;
@@ -275,7 +276,9 @@
   const periodName = () => (state.days === 1 ? "24 hours" : `${state.days} days`);
   function renderTiles() {
     const cur = slice(0);
-    const hasPrev = state.days * 2 <= DATA.history_days;
+    // Only compare with the previous period if we were already collecting back then.
+    const sinceT = DATA.tracking_since ? new Date(DATA.tracking_since).getTime() : now();
+    const hasPrev = state.days * 2 <= DATA.history_days && now() - 2 * state.days * DAY >= sinceT - DAY;
     const prev = hasPrev ? slice(1) : null;
     const bid = brandId();
     const ids = companies().map((e) => e.id);
@@ -295,7 +298,7 @@
       h("div", { class: "tile hero" },
         h("p", { class: "label", text: `BioMar mentions · last ${periodName()}` }),
         h("div", { class: "value", text: fmt(cc[bid]) }),
-        delta(cc[bid], pc ? pc[bid] : null, { label: "No earlier data to compare" }),
+        delta(cc[bid], pc ? pc[bid] : null, { label: "Comparison appears once a full previous period is tracked" }),
         sparkline(cur, bid)),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Share of voice" }),
