@@ -19,7 +19,9 @@ species and more) with operations in Europe, Latin America and Asia.
 
 You get the last 24 hours of analysed coverage of BioMar, its executives and its competitors, \
 plus comparison counts for the previous 7 days. Write for busy marketers: plain language, \
-concrete, no hype. Only state what the coverage shows. If there was little or no coverage, \
+concrete, no hype. Only state what the coverage shows. Items with headline_names_entity=false \
+were linked by a full-text search match and may only mention the company in passing, so \
+weigh them lightly. If there was little or no coverage, \
 say so briefly; do not invent significance.
 
 Fields:
@@ -92,7 +94,11 @@ def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = N
         "counts_prev_7d": _counts(cfg, prev7),
     }
     if not claude_available() or not today:
-        return {**base, **_fallback(cfg, today, prev7), "method": "automatic"}
+        # Without Claude to judge them, full-text-only matches are too noisy to summarise.
+        def named(ms):
+            return [m for m in ms if m.matched_by == "headline"]
+
+        return {**base, **_fallback(cfg, named(today), named(prev7)), "method": "automatic"}
 
     import anthropic
 
@@ -107,6 +113,7 @@ def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = N
             "topics": m.topics,
             "importance": m.importance,
             "summary": m.summary,
+            "headline_names_entity": m.matched_by == "headline",
         }
         for m in sorted(today, key=lambda m: (-m.importance, m.published))[:150]
     ]
@@ -134,4 +141,5 @@ def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = N
         return {**base, **out, "method": "claude"}
     except (anthropic.APIError, ValueError, StopIteration) as exc:
         log.warning("Briefing via Claude failed (%s); using automatic briefing", exc)
-        return {**base, **_fallback(cfg, today, prev7), "method": "automatic"}
+        named = [m for m in today if m.matched_by == "headline"]
+        return {**base, **_fallback(cfg, named, [m for m in prev7 if m.matched_by == "headline"]), "method": "automatic"}

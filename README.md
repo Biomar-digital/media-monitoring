@@ -110,9 +110,22 @@ SeafoodSource) appear only when Google News or GDELT index them.
 
 ## How the analysis works
 
-- **Matching** (`monitor/matching.py`): whole-word alias matching with exclusions and
-  context rules. Duplicates across sources and editions are merged into one record per
-  headline and publisher.
+- **Matching** (`monitor/matching.py`): every article is labelled by how it was linked to
+  a company:
+  - *Headline match*: the headline or snippet names the company, after alias,
+    exclusion and context rules. For example, people surnamed Skretting and Brazil's
+    "Rede Biomar" are filtered out. These are precise, so the dashboard's metrics count
+    only these by default.
+  - *Full-text match*: the search engine matched the company in the article text but the
+    headline doesn't name it (for example "Pareto analyst recommends feed producer").
+    These are kept only when the headline uses aquaculture or feed vocabulary, or the
+    publisher is a trade outlet (`industry_context` and `trade_domains` in the
+    watchlist). They add coverage but include passing mentions in sidebars and
+    related-article lists. The **Include full-text matches** filter adds them to every
+    chart, and they are labelled in the article list.
+
+  Duplicates across sources and editions are merged into one record per headline and
+  publisher domain.
 - **Claude** (`monitor/analysis.py`): items are sent in batches of 20 with structured JSON
   output. For each item Claude returns relevance, the entities involved, a sentiment
   score from −1 to +1 per entity (so "Skretting recalls feed; BioMar steps in" can score

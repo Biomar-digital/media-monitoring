@@ -134,15 +134,15 @@ entities:
 # that the search engine matched on full text but whose headline doesn't name the company,
 # and to separate Skretting the company from people with that surname.
 industry_context: [
-  aquacult, aquafeed, aqua, feed, fish, salmon, trout, shrimp, prawn, seafood, tilapia, "sea bass", "sea bream", hatcher, krill, Nutreco,
-  fôr, fisk, laks, ørret, oppdrett, havbruk, sjømat, smolt, lus,          # Norwegian
+  aquacult, aquafeed, "aqua feed", "aqua nutrition", feed, fish, salmon, trout, shrimp, prawn, seafood, tilapia, "sea bass", "sea bream", hatcher, krill, Nutreco,
+  fôr, fisk, laks, ørret, oppdrett, havbruk, sjømat, smolt,               # Norwegian
   foder, fiske, akvakultur, opdræt, ørred,                               # Danish
   acuicult, alimento, salmón, camarón, langostino, pesca, pescado, piensos, # Spanish
   aquicult, ração, camarão, tilápia, peixe,                               # Portuguese
   aquacole, aliment, saumon, crevette, poisson,                           # French
-  "su ürünleri", balık, yem, levrek, çipura,                              # Turkish
+  "su ürünleri", balık, "balık yemi", levrek, çipura,                     # Turkish
   ιχθυ, υδατοκαλλι,                                                      # Greek
-  "thủy sản", "thức ăn", tôm, cá,                                          # Vietnamese
+  "thủy sản", "thức ăn chăn nuôi", tôm,                                  # Vietnamese
   水产, 饲料, 鱼, 虾,                                                      # Chinese
   pakan, udang, budidaya, ikan,                                           # Indonesian
 ]

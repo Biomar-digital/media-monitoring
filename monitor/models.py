@@ -41,8 +41,10 @@ class RawArticle:
 
     @property
     def key(self) -> str:
-        # Same story syndicated by the same publisher across editions -> one record.
-        basis = f"{normalize_title(self.title)}|{(self.source or '').lower()}"
+        # Same story from the same publisher across editions/sources -> one record. Prefer the
+        # domain: sources spell publisher names differently ("Fishfarming expert" vs domain).
+        publisher = self.source_domain or self.source or ""
+        basis = f"{normalize_title(self.title)}|{publisher.lower()}"
         return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
 
 
