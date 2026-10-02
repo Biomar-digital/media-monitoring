@@ -68,7 +68,8 @@
   let DATA = null;
   let ENT = {};          // id -> entity
   const state = {
-    days: Number(store.get("mm.days")) || 30,
+    days: store.get("mm.days") != null && !Number.isNaN(Number(store.get("mm.days"))) ? Number(store.get("mm.days")) : 30,  // 0 = all time
+    stock: store.get("mm.stock") === "1",
     region: "",
     trend: null,         // Set of entity ids shown in the trend chart (null = auto)
     feed: { entity: "", tone: "", q: "", page: 0 },
@@ -131,7 +132,7 @@
     ENT = Object.fromEntries(data.entities.map((e) => [e.id, e]));
     for (const m of data.mentions) m._t = new Date(m.p).getTime();
     $("main").hidden = false;
-    const since = data.tracking_since ? ` since ${dateFmt.format(new Date(data.tracking_since))}` : "";
+    const since = data.tracking_since ? ` since ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(data.tracking_since))}` : "";
     $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked${since}`;
     setupFilters();
     renderAll();
@@ -145,11 +146,14 @@
   const DAY = 86400000;
   const now = () => Date.now();
   function inRange(m, from, to) { return m._t >= from && m._t < to; }
+  const sinceT = () => (DATA.tracking_since ? new Date(DATA.tracking_since).getTime() : now());
+  // Days covered by the selected range; "All time" (0) spans back to the first article.
+  const rangeDays = () => state.days || Math.max(1, Math.ceil((now() - sinceT()) / DAY) + 1);
   function slice(offsetPeriods = 0) {
-    const span = state.days * DAY;
+    const span = rangeDays() * DAY;
     const to = now() - offsetPeriods * span;
     const from = to - span;
-    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || (m.c || "") === state.region));
+    return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || (m.c || "") === state.region) && (state.stock || m.k !== "stock"));
   }
   const ofType = (t) => DATA.entities.filter((e) => e.type === t);
   const brandId = () => DATA.brand;
@@ -173,7 +177,6 @@
   function setupFilters() {
     const seg = $("rangeSeg");
     for (const b of seg.querySelectorAll("button")) {
-      if (Number(b.dataset.days) > DATA.history_days) b.hidden = true;
       b.addEventListener("click", () => {
         state.days = Number(b.dataset.days);
         store.set("mm.days", String(state.days));
@@ -181,6 +184,9 @@
         renderAll();
       });
     }
+    const sc = $("stockChk");
+    sc.checked = state.stock;
+    sc.addEventListener("change", () => { state.stock = sc.checked; store.set("mm.stock", sc.checked ? "1" : "0"); state.feed.page = 0; renderAll(); });
     const countries = [...new Set(DATA.mentions.map((m) => m.c || ""))];
     countries.sort((a, b) => countryName(a).localeCompare(countryName(b)));
     const sel = $("regionSel");
@@ -210,11 +216,13 @@
     renderAttention();
     renderFeed();
     const methods = DATA.analysis_methods || {};
-    const lex = methods.lexicon || 0;
+    const lex = methods.lexicon || 0, imp = methods.imported || 0;
     $("foot").textContent =
-      `Sources: Google News (17 regional editions), GDELT and trade-press RSS. Includes articles where the company appears in the text but not the headline (marked “Full-text match”). ` +
-      `Sentiment and topics are AI-assessed from headlines and snippets` +
-      (lex ? `; ${nf.format(lex)} articles were scored by the keyword fallback because no Claude API key was configured.` : ".");
+      `Sources: Google News (17 regional editions), GDELT and trade-press RSS` +
+      (imp ? `, plus ${nf.format(imp)} articles imported from the previous coverage tracker (their sentiment and summaries are kept)` : "") +
+      `. Includes articles where the company appears in the text but not the headline (marked “Full-text match”). ` +
+      (state.stock ? "Stock-data pages are included. " : "Stock-data pages are excluded; tick “Include stock-data pages” to count them. ") +
+      (lex ? `${nf.format(lex)} articles were scored by the keyword fallback because no Claude API key is configured.` : "");
   }
   function renderCharts() {
     renderSov();
@@ -268,12 +276,11 @@
     const arrow = d > 0 ? "▲" : d < 0 ? "▼" : "";
     return h("div", { class: "delta" }, h("span", { class: cls, text: `${arrow} ${signed(d)}${unit}` }), ` vs previous ${periodName()}`);
   }
-  const periodName = () => (state.days === 1 ? "24 hours" : `${state.days} days`);
+  const periodName = () => (state.days === 0 ? "all time" : state.days === 1 ? "24 hours" : state.days === 365 ? "12 months" : `${state.days} days`);
   function renderTiles() {
     const cur = slice(0);
     // Only compare with the previous period if we were already collecting back then.
-    const sinceT = DATA.tracking_since ? new Date(DATA.tracking_since).getTime() : now();
-    const hasPrev = state.days * 2 <= DATA.history_days && now() - 2 * state.days * DAY >= sinceT - DAY;
+    const hasPrev = state.days > 0 && now() - 2 * state.days * DAY >= sinceT() - DAY;
     const prev = hasPrev ? slice(1) : null;
     const bid = brandId();
     const ids = companies().map((e) => e.id);
@@ -291,9 +298,9 @@
     const tiles = $("tiles");
     tiles.replaceChildren(
       h("div", { class: "tile hero" },
-        h("p", { class: "label", text: `BioMar mentions · last ${periodName()}` }),
+        h("p", { class: "label", text: state.days ? `BioMar mentions · last ${periodName()}` : "BioMar mentions · all time" }),
         h("div", { class: "value", text: fmt(cc[bid]) }),
-        delta(cc[bid], pc ? pc[bid] : null, { label: "Comparison appears once a full previous period is tracked" }),
+        delta(cc[bid], pc ? pc[bid] : null, { label: state.days ? "Comparison appears once a full previous period is tracked" : `Since ${new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" }).format(new Date(sinceT()))}` }),
         sparkline(cur, bid)),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Share of voice" }),
@@ -314,17 +321,21 @@
     );
   }
 
-  // Buckets for the current range: hourly for 24h, daily up to 45 days, weekly beyond.
+  // Buckets for the current range: hourly for 24h, daily up to 45 days, weekly up to a
+  // year and a half, monthly beyond.
+  const MONTH = 30.4375 * DAY;
+  const monthFmt = new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" });
   function buckets() {
-    const end = now();
-    const step = state.days === 1 ? 3600000 : state.days <= 45 ? DAY : 7 * DAY;
-    const n = Math.ceil((state.days * DAY) / step);
+    const end = now(), days = rangeDays();
+    const step = days === 1 ? 3600000 : days <= 45 ? DAY : days <= 550 ? 7 * DAY : MONTH;
+    const n = Math.ceil((days * DAY) / step);
     const start = end - n * step;
     return { start, step, n, label: (i) => {
       const d = new Date(start + i * step);
-      return step === 3600000 ? hourFmt.format(d) : step === DAY ? dateFmt.format(d) : `Week of ${dateFmt.format(d)}`;
+      return step === 3600000 ? hourFmt.format(d) : step === DAY ? dateFmt.format(d) : step === MONTH ? monthFmt.format(d) : `Week of ${dateFmt.format(d)}`;
     } };
   }
+  const unitName = (B) => (B.step === DAY ? "day" : B.step === 3600000 ? "hour" : B.step === MONTH ? "month" : "week");
   function series(ms, id, B) {
     const out = new Array(B.n).fill(0);
     for (const m of ms) {
@@ -341,7 +352,7 @@
     const x = (i) => (B.n === 1 ? W / 2 : (i / (B.n - 1)) * (W - 8) + 4);
     const y = (val) => H - 4 - (val / max) * (H - 8);
     const d = v.map((val, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(val).toFixed(1)}`).join("");
-    return s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: H, role: "img", "aria-label": `Trend of BioMar mentions per ${B.step === DAY ? "day" : B.step === 3600000 ? "hour" : "week"}` },
+    return s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: H, role: "img", "aria-label": `Trend of BioMar mentions per ${unitName(B)}` },
       s("path", { d, fill: "none", stroke: "var(--de-emph)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }),
       s("circle", { cx: x(B.n - 1), cy: y(v[B.n - 1]), r: 4, fill: "var(--series-1)", stroke: "var(--surface-1)", "stroke-width": 2 }));
   }
@@ -437,6 +448,12 @@
       tip: [{ k: "Share of voice", v: total ? pct(c[id] / total) : "0%" }, { k: "Mentions", v: nf.format(c[id]) }],
     })).sort((a, b) => b.value - a.value);
     hbars($("sovChart"), rows, { highlight: brandId() });
+    const cs = DATA.competitors_since ? new Date(DATA.competitors_since).getTime() : null;
+    if (cs && now() - rangeDays() * DAY < cs - DAY) {
+      $("sovChart").append(h("p", { class: "note small", text:
+        `Competitors are tracked from ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(cs))}. ` +
+        "Earlier coverage comes from the imported BioMar history, so BioMar's share is overstated for this range." }));
+    }
   }
 
   // ---------------------------------------------------------------------------------
@@ -511,7 +528,7 @@
       } }, h("span", { class: "ln", style: `background:${colorOf(e.id)}` }), e.name);
     }));
     const B = buckets();
-    $("trendSub").textContent = `Mentions per ${B.step === DAY ? "day" : B.step === 3600000 ? "hour" : "week"} · pick companies to compare`;
+    $("trendSub").textContent = `Mentions per ${unitName(B)} · pick companies to compare`;
     const data = shown.map((id) => ({ id, v: series(ms, id, B) }));
     const maxV = Math.max(0, ...data.flatMap((d) => d.v));
     if (!maxV) return empty(el);
@@ -645,6 +662,7 @@
         h("span", { text: m.s }),
         h("span", { text: countryName(m.c) }),
         h("span", { text: relTime(m.p) }),
+        m.k === "stock" ? h("span", { class: "pill stock", title: "Automatically generated stock-data page", text: "Stock data" }) : null,
         m.mb === "search" ? h("span", { title: "The search engine matched the company in the article text; the headline doesn't name it.", text: "Full-text match" }) : null,
         ...m.e.map((e) => h("span", { class: "pill", text: ENT[e] ? ENT[e].name : e })),
         m.im >= 3 ? h("span", { class: "pill", style: "border-color:var(--critical)" }, h("span", { class: "attn-icon", text: "! " }), "Attention") : null));

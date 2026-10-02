@@ -84,10 +84,31 @@ class Config:
     rss_feeds: list[dict]
     industry_context: list[str] = field(default_factory=list)
     trade_domains: list[str] = field(default_factory=list)
+    stock_data: dict = field(default_factory=dict)
+    ignore_unless_brand_named: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._industry_re = _prefix_pattern(self.industry_context)
         self._trade = {d.lower() for d in self.trade_domains}
+        self._ignore_re = (re.compile("|".join(re.escape(t) for t in self.ignore_unless_brand_named), re.IGNORECASE)
+                           if self.ignore_unless_brand_named else None)
+        self._stock_domains = {d.lower() for d in self.stock_data.get("domains", [])}
+        pats = self.stock_data.get("title_patterns", [])
+        self._stock_re = re.compile("|".join(f"(?:{p})" for p in pats), re.IGNORECASE) if pats else None
+
+    def ignored(self, title: str) -> bool:
+        """Headline is about an organisation we deliberately don't track (e.g. Schouw & Co)
+        and doesn't name the brand itself."""
+        return bool(self._ignore_re and self._ignore_re.search(title) and not self.entity(self.brand).named_in(title))
+
+    def kind_of(self, title: str, source: str | None, domain: str | None) -> str:
+        """"stock" for generated stock-data pages (ticker, ratio, holdings pages), else "news"."""
+        names = " ".join(x.lower() for x in (domain, source) if x)
+        if any(d in names or d.split(".")[0] in names.replace(" ", "") for d in self._stock_domains):
+            return "stock"
+        if self._stock_re and self._stock_re.search(title):
+            return "stock"
+        return "news"
 
     def is_trade_domain(self, domain: str | None) -> bool:
         if not domain:
@@ -128,4 +149,6 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> Config:
         rss_feeds=raw.get("rss_feeds", []),
         industry_context=raw.get("industry_context", []),
         trade_domains=raw.get("trade_domains", []),
+        stock_data=raw.get("stock_data", {}),
+        ignore_unless_brand_named=raw.get("ignore_unless_brand_named", []),
     )

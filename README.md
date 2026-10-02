@@ -38,7 +38,7 @@ Each run also writes a **daily briefing**: a short, plain-language summary of th
 | Where / what | BioMar coverage by publisher country and by topic |
 | All coverage | Searchable, filterable list of every article with English translation and summary, plus CSV export |
 
-Filters for date range (24 hours to 180 days) and region apply to everything on the page.
+Filters for date range (24 hours to all time), region and stock-data pages apply to everything on the page.
 The dashboard works in light and dark mode and on phones.
 
 ## Setting it up (one time, about 15 minutes)
@@ -96,6 +96,42 @@ and trade-press feeds. Changes take effect on the next run, with no code changes
   that stays colour-blind safe. To add a ninth, replace one.
 - The executive list comes from BioMar's Q2 2026 interim report and
   biomar.com/our-story/our-structure. Review it when leadership changes.
+
+## Importing history from another tracker
+
+```bash
+python -m monitor import --file biomar-coverage.xlsx
+python -m monitor build
+```
+
+This reads the **Mentions** sheet of an export (columns Title, URL, Outlet, Language, Country,
+Published, Sentiment, Prominence, Risk flags, People quoted, Summary):
+
+- Its sentiment and summaries are kept (`analysis: imported`), so Claude doesn't re-score them.
+  Summaries that contain leftover model output are cleaned.
+- Risk flags set importance: legal, controversy and product issues mark an article
+  "needs attention"; negative coverage and executive statements count as notable.
+- Articles already in the tracker (same headline and publisher) are merged. Imported
+  sentiment replaces keyword-fallback scores.
+- Executives are picked up from the headline and the "People quoted" column.
+
+Google News can't be searched exhaustively back in time: date-range searches return only a
+small sample of older articles. Importing an existing tracker's history is the way to fill
+the past; from then on the 6-hourly runs collect coverage while it's fresh.
+
+The October 2026 import added BioMar coverage back to 1998. Competitors are only tracked
+from April 2026, so the dashboard notes that share of voice is overstated for longer ranges.
+
+## Stock-data pages and Schouw & Co
+
+- **Stock-data pages** are automatically generated price, ratio and holdings pages: TradingView
+  ticker pages ("EBITDA margin % of BioMar Group A/S – MUN:2IT"), Simply Wall St, Yahoo quote
+  and options pages. They're labelled "Stock data". The **Include stock-data pages** switch on
+  the dashboard adds them to every figure; it's off by default. TradingView's news briefs (IPO,
+  guidance) count as normal news. Rules: `stock_data` in the watchlist.
+- **Schouw & Co** (BioMar's former parent) coverage is ignored unless the headline also names
+  BioMar (`ignore_unless_brand_named` in the watchlist). This applies to collection, import and
+  stored data.
 
 ## Sources and licensing
 

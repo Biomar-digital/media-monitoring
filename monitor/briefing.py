@@ -85,6 +85,7 @@ def _fallback(cfg: Config, today: list[Mention], prev7: list[Mention]) -> dict:
 
 def make_briefing(cfg: Config, mentions: list[Mention], now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
+    mentions = [m for m in mentions if m.kind != "stock"]  # stock-data pages aren't coverage
     today = _window(mentions, now - timedelta(hours=24), now + timedelta(minutes=5))
     prev7 = _window(mentions, now - timedelta(days=8), now - timedelta(hours=24))
     base = {

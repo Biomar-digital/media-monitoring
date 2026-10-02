@@ -245,3 +245,47 @@ def test_google_news_range_splits_when_capped(monkeypatch):
     monkeypatch.setattr(google_news.time, "sleep", lambda s: None)
     out = google_news._range(None, '"BioMar"', ("US", "en"), date(2026, 1, 1), date(2026, 3, 2), 0)
     assert len(calls) == 3 and len(out) == 6  # capped range discarded, two halves searched
+
+
+def test_stock_data_classification(cfg):
+    assert cfg.kind_of("Equity in earnings of BioMar Group A/S – HAN:2IT", "TradingView", None) == "stock"
+    assert cfg.kind_of("BioMar Group A/S (BIOMAR.CO) insider ownership and holdings", "Yahoo Finance UK", None) == "stock"
+    assert cfg.kind_of("Pareto Securities raises its price target for BioMar Group to DKK 140", "marketscreener.com", None) == "news"
+    assert cfg.kind_of("BioMar posts higher volumes", "IntraFish", "intrafish.com") == "news"
+
+
+def test_import_rows(cfg):
+    from monitor.importer import clean_summary, import_rows
+    store, _ = merge_raw(cfg, {}, [raw("BioMar posts higher volumes", source="IntraFish")])
+    existing = next(iter(store.values()))
+    existing.source_domain = "intrafish.com"
+    analysis._apply_lexicon(cfg, existing)
+    rows = [
+        {"Title": "BioMar posts higher volumes - IntraFish", "Outlet": "IntraFish", "Published": "2026-05-01T08:37:55+00:00",
+         "Sentiment": "positive", "Prominence": "primary", "Summary": "Volumes rose.", "Country": "NO", "Language": "en"},
+        {"Title": "Schouw & Co. share buy-back programme, week 17 2026 - Finansavisen", "Outlet": "Finansavisen",
+         "Published": "2026-04-28T08:00:00+00:00", "Sentiment": "neutral"},
+        {"Title": "Equity in earnings of BioMar Group A/S – HAN:2IT - TradingView", "Outlet": "TradingView",
+         "Published": "2026-09-29T20:12:27+00:00", "Sentiment": "neutral", "Country": "INT"},
+        {"Title": "BioMar CEO Carlos Diaz on feed prices - iLaks", "Outlet": "iLaks", "Published": "2026-06-02T10:00:00+00:00",
+         "Sentiment": "negative", "Prominence": "primary", "Risk flags": "legal", "People quoted": "Carlos Diaz (BioMar CEO)",
+         "Summary": 'Long preamble.\n\nMore text {"is_about_target_brand": true, "summary": "Clean summary."}'},
+    ]
+    stats = import_rows(cfg, store, rows)
+    assert stats == {"added": 2, "merged": 1, "schouw_skipped": 1, "stock": 1, "invalid": 0}
+    assert existing.analysis == "imported" and existing.sentiment["biomar"] > 0  # upgraded from lexicon
+    by_title = {m.title: m for m in store.values()}
+    stock = by_title["Equity in earnings of BioMar Group A/S – HAN:2IT"]
+    assert stock.kind == "stock" and stock.country is None
+    ceo = by_title["BioMar CEO Carlos Diaz on feed prices"]
+    assert ceo.entities == ["biomar", "carlos-diaz"] and ceo.importance == 3 and ceo.summary == "Clean summary."
+    assert clean_summary("Short and fine.") == "Short and fine."
+
+
+def test_schouw_ignored_unless_biomar_named(cfg):
+    from monitor.matching import attribute
+    a = raw("Schouw & Co. share buy-back programme, week 39 2026")
+    a.query_entity = "biomar"
+    assert attribute(cfg, a) == ([], "headline")
+    assert cfg.ignored("SCHO: Profit before tax up 36% YoY")
+    assert not cfg.ignored("Schouw & Co announces BioMar IPO plans")

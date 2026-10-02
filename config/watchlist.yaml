@@ -155,6 +155,30 @@ trade_domains: [
   fishfarmermagazine.com, thefishsite.com, worldfishing.net, iqua.no, aquaculturemag.com, panoramaacuicola.com,
 ]
 
+# Coverage of these organisations is ignored unless the headline also names BioMar
+# (Schouw & Co is BioMar's former parent; SCHO is its ticker).
+ignore_unless_brand_named: ["Schouw", "SCHO:"]
+
+# Stock-data pages: automatically generated price, ratio and holdings pages (not journalism).
+# They're kept and labelled "Stock data"; the dashboard can include or exclude them.
+stock_data:
+  # Whole sites that only publish generated data pages. (TradingView also publishes news
+  # briefs, so it's matched by the ticker suffix in its data-page titles instead.)
+  domains: [simplywall.st]
+  title_patterns:
+    - '[–:,-]\s*[A-Z]{2,10}:[A-Z0-9.]{1,10}\s*$'    # "… – MUN:2IT", "…: LS:A42CV2"
+    - '\bForecast\s*[—–-]\s*Price Target\b'
+    - '\b(HAN|OMXCOP|CPH|FRA|ETR|OTC|NASDAQ):\s?[A-Z0-9.]+'
+    - '\bBalance Sheet\b.*[A-Z]{2,10}:'
+    - '\(BIOMAR\.CO\)'
+    - '\b(stock|share) price\b'
+    - '\bstock quote\b'
+    - '\b(call|put) \([A-Z0-9]+\)'
+    - '\binsider ownership\b'
+    - '\bETFs investing in\b'
+    - '\b(equity in earnings|net current asset value|price to book|enterprise value|price to earnings|dividend yield) (of|de)\b'
+    - '\bprecio objetivo 20\d\d, TV\b'
+
 # Topics Claude assigns to each article (keep the list short and stable so trends are comparable).
 topics:
   - Financial results & markets

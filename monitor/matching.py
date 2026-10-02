@@ -40,6 +40,8 @@ def attribute(cfg: Config, raw: RawArticle) -> tuple[list[str], str]:
     the article is about something else and is dropped.
     """
     text = f"{raw.title}\n{raw.snippet}"
+    if cfg.ignored(raw.title):
+        return [], "headline"
     found = match_entities(cfg, text, raw.source_domain)
     q = raw.query_entity
     if (q and q not in found and q in cfg.entity_ids and not cfg.entity(q).named_in(text)
@@ -79,6 +81,8 @@ def merge_raw(
                 m.entities.extend(added)
                 m.analysis = "pending"  # re-score so every entity gets a sentiment
             continue
-        existing[key] = Mention.from_raw(raw, entities, matched_by)
+        m = Mention.from_raw(raw, entities, matched_by)
+        m.kind = cfg.kind_of(raw.title, raw.source, raw.source_domain)
+        existing[key] = m
         new_ids.append(key)
     return existing, new_ids

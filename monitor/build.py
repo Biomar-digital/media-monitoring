@@ -19,11 +19,12 @@ from .store import Store
 
 DASHBOARD_SRC = ROOT / "dashboard"
 SITE_DIR = ROOT / "site"
-HISTORY_DAYS = 180
+HISTORY_DAYS: int | None = None  # None = everything on record
 
 
-def dashboard_payload(cfg: Config, store: Store, history_days: int = HISTORY_DAYS) -> dict:
-    mentions = sorted(store.load_since(history_days), key=lambda m: m.published, reverse=True)
+def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HISTORY_DAYS) -> dict:
+    source = store.load_since(history_days) if history_days else list(store.load_all().values())
+    mentions = sorted(source, key=lambda m: m.published, reverse=True)
     rows = [
         {
             "id": m.id,
@@ -42,6 +43,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int = HISTORY_DAY
             "im": m.importance,
             "a": m.analysis,
             "mb": m.matched_by,
+            "k": cfg.kind_of(m.title, m.source, m.source_domain),
         }
         for m in mentions
     ]
@@ -50,9 +52,11 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int = HISTORY_DAY
         "brand": cfg.brand,
         "entities": [e.to_public() for e in cfg.entities],
         "topics": cfg.topics,
-        "history_days": history_days,
+        "history_days": history_days or 0,
         # Earliest article on record: comparisons with periods before this would be fake.
         "tracking_since": min((m.published for m in mentions), default=None),
+        # Imported history covers BioMar only; competitors are tracked from the first collected article.
+        "competitors_since": min((m.published for m in mentions if "import" not in m.origins), default=None),
         "analysis_methods": dict(Counter(m.analysis for m in mentions)),
         "briefings": store.latest_briefings(14),
         "mentions": rows,

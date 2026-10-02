@@ -6,6 +6,7 @@
     python -m monitor brief            # write today's briefing
     python -m monitor build            # build site/ from stored data
     python -m monitor serve            # preview site/ at http://localhost:8000
+    python -m monitor import --file history.xlsx   # import an existing tracker's export
 """
 
 from __future__ import annotations
@@ -28,6 +29,15 @@ log = logging.getLogger("monitor")
 SOURCES = ("google_news", "gdelt", "rss")
 
 
+def reclassify(cfg, mentions) -> None:
+    """Re-apply the watchlist's stock-data and ignore rules to stored articles, so rule
+    changes take effect on existing data too."""
+    for key in [k for k, m in mentions.items() if cfg.ignored(m.title)]:
+        del mentions[key]
+    for m in mentions.values():
+        m.kind = cfg.kind_of(m.title, m.source, m.source_domain)
+
+
 def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
     queries = [(e.id, q) for e in cfg.entities for q in e.queries]
     raws = []
@@ -46,6 +56,7 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int) -> int:
         log.info("rss: %d items scanned", len(found))
         raws += found
     mentions, new_ids = merge_raw(cfg, store.load_all(), raws, store.load_discarded())
+    reclassify(cfg, mentions)
     store.save(mentions)
     log.info("collect: %d new mentions (%d stored)", len(new_ids), len(mentions))
     return len(new_ids)
@@ -65,6 +76,16 @@ def cmd_brief(cfg, store: Store) -> None:
     log.info("briefing (%s): %s", b["method"], b["headline"])
 
 
+def cmd_import(cfg, store: Store, path: str) -> None:
+    from .importer import import_file
+
+    mentions = store.load_all()
+    stats = import_file(cfg, mentions, path)
+    reclassify(cfg, mentions)
+    store.save(mentions)
+    log.info("import: %s (%d stored)", stats, len(mentions))
+
+
 def cmd_build(cfg, store: Store) -> None:
     out = build_site(cfg, store)
     log.info("built dashboard in %s", out)
@@ -81,7 +102,8 @@ def cmd_serve(port: int) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="monitor", description="BioMar media monitoring")
-    p.add_argument("command", choices=["run", "collect", "analyse", "brief", "build", "serve"])
+    p.add_argument("command", choices=["run", "collect", "analyse", "brief", "build", "serve", "import"])
+    p.add_argument("--file", help="Excel export to import (with the import command)")
     p.add_argument("--sources", default=",".join(SOURCES), help=f"comma list from {SOURCES}")
     p.add_argument("--window-days", type=int, default=2, help="how far back each search looks")
     p.add_argument("--limit", type=int, default=400, help="max mentions to analyse per run")
@@ -99,6 +121,11 @@ def main(argv: list[str] | None = None) -> int:
     if unknown:
         p.error(f"unknown sources: {', '.join(sorted(unknown))}")
 
+    if a.command == "import":
+        if not a.file:
+            p.error("import needs --file")
+        cmd_import(cfg, store, a.file)
+        return 0
     if a.command == "serve":
         cmd_serve(a.port)
     if a.command in ("run", "collect"):

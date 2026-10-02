@@ -73,7 +73,8 @@ class Mention:
     # headline: the headline/snippet names the entity. search: only the search engine's
     # full-text match links it (e.g. "Pareto recommends feed producer").
     matched_by: str = "headline"
-    analysis: str = "pending"  # claude | lexicon | pending
+    kind: str = "news"  # news | stock (generated stock-data page)
+    analysis: str = "pending"  # claude | lexicon | imported | pending
 
     @classmethod
     def from_raw(cls, raw: RawArticle, entities: list[str], matched_by: str = "headline") -> "Mention":
