@@ -5,16 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>BioMar Media Monitor</title>
+<link rel="icon" href="assets/biomar-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="shell">
+<aside class="side" aria-label="BioMar Media Monitor">
+  <a class="side-brand" href="#top">
+    <img src="assets/biomar-logo.png" alt="BioMar" width="64" height="60">
+    <span>Media Monitor</span>
+  </a>
+  <nav class="side-nav" aria-label="Sections">
+    <a href="#overview"><span class="ico" aria-hidden="true">◎</span>Overview</a>
+    <a href="#competitors"><span class="ico" aria-hidden="true">▤</span>Competitors</a>
+    <a href="#people"><span class="ico" aria-hidden="true">◍</span>Executives</a>
+    <a href="#reach"><span class="ico" aria-hidden="true">◌</span>Reach &amp; topics</a>
+    <a href="#coverage"><span class="ico" aria-hidden="true">≡</span>All coverage</a>
+  </nav>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">Light / dark</button>
+</aside>
 <div class="viz-root" id="app">
-  <header class="top">
+  <header class="top" id="top">
     <div class="brandline">
-      <h1>BioMar Media Monitor</h1>
+      <p class="kicker">Global Marketing</p>
+      <h1>What the world is saying about BioMar</h1>
       <p class="sub" id="updated">Loading…</p>
     </div>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">◐</button>
   </header>
 
   <!-- Password gate (only shown when the data file is encrypted) -->
@@ -45,10 +64,12 @@
       </label>
     </div>
 
+    <div id="overview" class="anchor"></div>
     <section class="briefing card" id="briefing" aria-labelledby="briefingTitle"></section>
 
     <section class="tiles" id="tiles" aria-label="Key figures"></section>
 
+    <div id="competitors" class="anchor"></div>
     <div class="grid two">
       <section class="card" aria-labelledby="sovTitle">
         <h2 id="sovTitle">Share of voice</h2>
@@ -73,6 +94,7 @@
       <div id="trendChart" class="chart"></div>
     </section>
 
+    <div id="people" class="anchor"></div>
     <div class="grid two">
       <section class="card" aria-labelledby="execTitle">
         <h2 id="execTitle">Executives in the news</h2>
@@ -85,6 +107,7 @@
       </section>
     </div>
 
+    <div id="reach" class="anchor"></div>
     <div class="grid two">
       <section class="card" aria-labelledby="geoTitle">
         <h2 id="geoTitle">Where BioMar is covered</h2>
@@ -98,6 +121,7 @@
       </section>
     </div>
 
+    <div id="coverage" class="anchor"></div>
     <section class="card" aria-labelledby="feedTitle">
       <div class="card-head">
         <h2 id="feedTitle">All coverage</h2>
@@ -122,6 +146,7 @@
     <footer class="foot muted small" id="foot"></footer>
   </main>
   <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+</div>
 </div>
 <script src="app.js"></script>
 </body>

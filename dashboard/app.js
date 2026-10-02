@@ -135,6 +135,7 @@
     $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked${since}`;
     setupFilters();
     renderAll();
+    window.dispatchEvent(new Event("scroll"));  // re-mark the sidebar now that sections have height
     let t;
     window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(renderCharts, 120); });
   }
@@ -343,7 +344,7 @@
     const d = v.map((val, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(val).toFixed(1)}`).join("");
     return s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: H, role: "img", "aria-label": `Trend of BioMar mentions per ${B.step === DAY ? "day" : B.step === 3600000 ? "hour" : "week"}` },
       s("path", { d, fill: "none", stroke: "var(--de-emph)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }),
-      s("circle", { cx: x(B.n - 1), cy: y(v[B.n - 1]), r: 4, fill: "var(--accent)", stroke: "var(--surface-1)", "stroke-width": 2 }));
+      s("circle", { cx: x(B.n - 1), cy: y(v[B.n - 1]), r: 4, fill: "var(--series-1)", stroke: "var(--surface-1)", "stroke-width": 2 }));
   }
 
   // ---------------------------------------------------------------------------------
@@ -432,7 +433,7 @@
     const total = ids.reduce((a, i) => a + c[i], 0);
     const rows = ids.map((id) => ({
       id, label: ENT[id].name, value: c[id],
-      color: id === brandId() ? "var(--accent)" : "var(--de-emph)",
+      color: id === brandId() ? "var(--series-1)" : "var(--de-emph)",
       valueText: total ? pct(c[id] / total) : "0%",
       tip: [{ k: "Share of voice", v: total ? pct(c[id] / total) : "0%" }, { k: "Mentions", v: nf.format(c[id]) }],
     })).sort((a, b) => b.value - a.value);
@@ -587,7 +588,7 @@
   function renderGeo() {
     const c = {};
     for (const m of brandSlice()) c[m.c || ""] = (c[m.c || ""] || 0) + 1;
-    let rows = Object.entries(c).map(([k, v]) => ({ label: countryName(k), value: v, color: "var(--accent)", valueText: nf.format(v) }));
+    let rows = Object.entries(c).map(([k, v]) => ({ label: countryName(k), value: v, color: "var(--series-1)", valueText: nf.format(v) }));
     rows.sort((a, b) => b.value - a.value);
     if (rows.length > 10) {
       const rest = rows.slice(9).reduce((a, r) => a + r.value, 0);
@@ -598,7 +599,7 @@
   function renderTopics() {
     const c = {};
     for (const m of brandSlice()) for (const t of m.tp || []) c[t] = (c[t] || 0) + 1;
-    const rows = Object.entries(c).map(([k, v]) => ({ label: k, value: v, color: "var(--accent)", valueText: nf.format(v) })).sort((a, b) => b.value - a.value);
+    const rows = Object.entries(c).map(([k, v]) => ({ label: k, value: v, color: "var(--series-1)", valueText: nf.format(v) })).sort((a, b) => b.value - a.value);
     hbars($("topicChart"), rows, { labelW: 200 });
   }
 
@@ -612,7 +613,7 @@
       return { e, t: toneBy(ms, e.id), latest: mine[0] };
     }).sort((a, b) => b.t.n - a.t.n);
     const rows = execs.map(({ e, t, latest }) => h("tr", {},
-      h("td", {}, h("div", { style: "font-weight:550", text: e.name }), h("div", { class: "muted small", text: e.role || "" })),
+      h("td", {}, h("div", { class: "person", text: e.name }), h("div", { class: "muted small", text: e.role || "" })),
       h("td", { class: "num", text: nf.format(t.n) }),
       h("td", { class: "num", text: t.n ? signed(t.net) : "–" }),
       h("td", {}, latest ? h("a", { href: latest.u, target: "_blank", rel: "noopener noreferrer", class: "small", text: latest.t }) : h("span", { class: "muted small", text: "No coverage in period" }))));
@@ -696,6 +697,18 @@
     store.set("mm.theme", next);
     if (DATA) renderCharts();
   });
+
+  // Sidebar: highlight the section in view.
+  const navLinks = [...document.querySelectorAll(".side-nav a")];
+  function markNav() {
+    let current = navLinks[0];
+    for (const a of navLinks) {
+      const el = document.getElementById(a.hash.slice(1));
+      if (el && el.getBoundingClientRect().top < window.innerHeight * 0.35) current = a;
+    }
+    for (const a of navLinks) a.classList.toggle("active", a === current);
+  }
+  if (navLinks.length) { window.addEventListener("scroll", markNav, { passive: true }); markNav(); }
 
   load();
 })();

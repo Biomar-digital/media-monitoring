@@ -1,22 +1,27 @@
 {
   "date": "2026-10-02",
-  "generated_at": "2026-10-02T08:36:29+00:00",
+  "generated_at": "2026-10-02T08:52:46+00:00",
   "counts_24h": {
     "BioMar": 2
   },
   "counts_prev_7d": {
-    "BioMar": 7,
+    "BioMar": 8,
     "Skretting": 4,
     "Cargill Aqua Nutrition": 1,
     "Claus Eskildsen": 1,
     "Vitapro": 1,
     "Mowi Feed": 1
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 1.1).",
+  "summary": "Tone of BioMar coverage: 0 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "Bakkafrost, primer productor de salmón atlántico en lograr la certificación ASC Farm Standard",
+    "Stor aktør har kjøpt opp fire leverandørselskaper (+)"
+  ],
   "competitors": [],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "de7c6e27729cce7b"
+  ],
   "method": "automatic"
 }
