@@ -105,42 +105,26 @@ a { color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 [hidden] { display: none !important; }
 
-/* ---- Shell: BioMar Blue sidebar like the customer portal ---- */
-.shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
-.side {
-  background: var(--side-bg); color: var(--side-ink);
-  position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 14px; gap: 18px;
-}
-.side-brand { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: var(--side-ink); padding: 4px 0 10px; }
+/* ---- Brand bar: BioMar Blue strip with the boxed logo ---- */
+.brandbar { background: var(--side-bg); color: var(--side-ink); }
+.brandbar-inner { max-width: 1280px; margin: 0 auto; padding: 10px 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--side-ink); }
 /* Brand rule: logo over BioMar Blue may use a dark outer glow to define the box edges. */
-.side-brand img { width: 64px; height: auto; display: block; border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,0,0,.12), 0 4px 14px rgba(0,0,0,.45); }
-.side-brand span { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
-.side-nav { display: flex; flex-direction: column; gap: 4px; }
-.side-nav a {
-  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
-  color: var(--side-ink); text-decoration: none; font-size: 13.5px; font-weight: 500;
-}
-.side-nav a:hover { background: rgba(255,255,255,0.08); }
-.side-nav a.active { background: var(--side-active); color: var(--side-active-ink); font-weight: 600; }
-.side-nav .ico { width: 18px; text-align: center; opacity: .85; }
+.brand img { width: 44px; height: auto; display: block; border-radius: 7px; box-shadow: 0 0 0 1px rgba(0,0,0,.12), 0 3px 10px rgba(0,0,0,.45); }
+.brand span { font-weight: 600; font-size: 15px; letter-spacing: 0.02em; }
 .theme-toggle {
-  margin-top: auto; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: var(--side-muted);
-  border-radius: 8px; padding: 8px 10px; cursor: pointer; font: inherit; font-size: 12.5px; text-align: left;
+  border: 1px solid rgba(255,255,255,0.22); background: transparent; color: var(--side-muted);
+  border-radius: 8px; padding: 7px 11px; cursor: pointer; font: inherit; font-size: 12.5px;
 }
 .theme-toggle:hover { background: rgba(255,255,255,0.08); }
 
-.viz-root { padding: 28px 32px 48px; max-width: 1280px; width: 100%; }
+.viz-root { padding: 26px 32px 48px; max-width: 1280px; margin: 0 auto; }
 .anchor { position: relative; top: -70px; }
 
 @media (max-width: 900px) {
-  .shell { grid-template-columns: minmax(0, 1fr); }
-  .side { position: sticky; top: 0; z-index: 10; height: auto; flex-direction: row; align-items: center; padding: 8px 16px; gap: 12px; }
-  .side-brand { flex-direction: row; padding: 0; }
-  .side-brand img { width: 36px; border-radius: 6px; }
-  .side-nav { display: none; }
-  .theme-toggle { margin: 0 0 0 auto; padding: 6px 9px; }
+  .brandbar-inner { padding: 8px 16px; }
+  .brand img { width: 36px; border-radius: 6px; }
   .viz-root { padding: 18px 16px 40px; }
-  .filters { top: 52px; }
 }
 
 .top { margin-bottom: 18px; }
@@ -276,7 +260,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   .tone .dot, .legend .sw, .legend .ln { forced-color-adjust: none; }
 }
 @media print {
-  .side, .filters, .pager, .feed-filters { display: none; }
-  .shell { display: block; }
+  .theme-toggle, .filters, .pager, .feed-filters { display: none; }
   .card, .tile { box-shadow: none; break-inside: avoid; }
 }

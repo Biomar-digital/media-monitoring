@@ -135,7 +135,6 @@
     $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked${since}`;
     setupFilters();
     renderAll();
-    window.dispatchEvent(new Event("scroll"));  // re-mark the sidebar now that sections have height
     let t;
     window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(renderCharts, 120); });
   }
@@ -697,18 +696,6 @@
     store.set("mm.theme", next);
     if (DATA) renderCharts();
   });
-
-  // Sidebar: highlight the section in view.
-  const navLinks = [...document.querySelectorAll(".side-nav a")];
-  function markNav() {
-    let current = navLinks[0];
-    for (const a of navLinks) {
-      const el = document.getElementById(a.hash.slice(1));
-      if (el && el.getBoundingClientRect().top < window.innerHeight * 0.35) current = a;
-    }
-    for (const a of navLinks) a.classList.toggle("active", a === current);
-  }
-  if (navLinks.length) { window.addEventListener("scroll", markNav, { passive: true }); markNav(); }
 
   load();
 })();

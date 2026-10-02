@@ -12,21 +12,15 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="shell">
-<aside class="side" aria-label="BioMar Media Monitor">
-  <a class="side-brand" href="#top">
-    <img src="assets/biomar-logo.png" alt="BioMar" width="64" height="60">
-    <span>Media Monitor</span>
-  </a>
-  <nav class="side-nav" aria-label="Sections">
-    <a href="#overview"><span class="ico" aria-hidden="true">◎</span>Overview</a>
-    <a href="#competitors"><span class="ico" aria-hidden="true">▤</span>Competitors</a>
-    <a href="#people"><span class="ico" aria-hidden="true">◍</span>Executives</a>
-    <a href="#reach"><span class="ico" aria-hidden="true">◌</span>Reach &amp; topics</a>
-    <a href="#coverage"><span class="ico" aria-hidden="true">≡</span>All coverage</a>
-  </nav>
-  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">Light / dark</button>
-</aside>
+<header class="brandbar">
+  <div class="brandbar-inner">
+    <a class="brand" href="#top">
+      <img src="assets/biomar-logo.png" alt="BioMar" width="44" height="41">
+      <span>Media Monitor</span>
+    </a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">Light / dark</button>
+  </div>
+</header>
 <div class="viz-root" id="app">
   <header class="top" id="top">
     <div class="brandline">
@@ -146,7 +140,6 @@
     <footer class="foot muted small" id="foot"></footer>
   </main>
   <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
-</div>
 </div>
 <script src="app.js"></script>
 </body>
