@@ -45,15 +45,14 @@
 
   <main id="main" hidden>
     <div class="filters" role="toolbar" aria-label="Filters">
-      <div class="seg" id="rangeSeg" role="radiogroup" aria-label="Date range">
-        <button data-days="1" role="radio">24 hours</button>
-        <button data-days="7" role="radio">7 days</button>
-        <button data-days="30" role="radio">30 days</button>
-        <button data-days="90" role="radio">90 days</button>
-        <button data-days="180" role="radio">180 days</button>
-        <button data-days="365" role="radio">1 year</button>
-        <button data-days="0" role="radio">All time</button>
-      </div>
+      <label class="select strong">
+        <span>Period</span>
+        <select id="rangeSel" aria-label="Period"></select>
+      </label>
+      <label class="select strong">
+        <span>Company</span>
+        <select id="focusSel" aria-label="Company in focus"></select>
+      </label>
       <label class="check-inline" title="Stock-data pages are automatically generated price, ratio and holdings pages (e.g. TradingView). They're labelled in the article list.">
         <input type="checkbox" id="stockChk"> Include stock-data pages <span id="stockCount" class="muted"></span>
       </label>
@@ -69,6 +68,12 @@
     <section class="tiles" id="tiles" aria-label="Key figures"></section>
 
     <div id="competitors" class="anchor"></div>
+    <section class="card" aria-labelledby="cmpTitle">
+      <h2 id="cmpTitle">Competitor overview</h2>
+      <p class="muted small">Every company tracked the same way: name, local-language searches and key executives. Select a company to focus the page on it.</p>
+      <div id="cmpTable"></div>
+    </section>
+
     <div class="grid two">
       <section class="card" aria-labelledby="sovTitle">
         <h2 id="sovTitle">Share of voice</h2>
@@ -101,7 +106,7 @@
       </section>
       <section class="card" aria-labelledby="attnTitle">
         <h2 id="attnTitle">Needs attention</h2>
-        <p class="muted small">Negative or high-importance coverage of BioMar and its people</p>
+        <p class="muted small" id="attnSub">Negative or high-importance coverage of BioMar and its people</p>
         <div id="attention" class="list"></div>
       </section>
     </div>
@@ -110,12 +115,12 @@
     <div class="grid two">
       <section class="card" aria-labelledby="geoTitle">
         <h2 id="geoTitle">Where BioMar is covered</h2>
-        <p class="muted small">BioMar mentions by market (publisher country)</p>
+        <p class="muted small" id="geoSub">BioMar mentions by market (publisher country)</p>
         <div id="geoChart" class="chart"></div>
       </section>
       <section class="card" aria-labelledby="topicTitle">
         <h2 id="topicTitle">What BioMar coverage is about</h2>
-        <p class="muted small">BioMar mentions by topic</p>
+        <p class="muted small" id="topicSub">BioMar mentions by topic</p>
         <div id="topicChart" class="chart"></div>
       </section>
     </div>

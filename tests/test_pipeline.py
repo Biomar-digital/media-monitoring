@@ -417,3 +417,23 @@ def test_unconfirmed_matches_hidden_from_dashboard(cfg, tmp_path, monkeypatch):
     payload = build.dashboard_payload(cfg, st)
     titles = [m["t"] for m in payload["mentions"]]
     assert titles == ["BioMar opens new feed plant"] and payload["unconfirmed_hidden"] == 1
+
+
+def test_circuit_breaker_skips_failing_host(monkeypatch):
+    from monitor.sources import http
+    http._failures.clear()
+    calls = []
+
+    class C:
+        def get(self, url, params=None):
+            calls.append(url)
+            import httpx
+            req = httpx.Request("GET", url)
+            return httpx.Response(503, request=req)
+
+    monkeypatch.setattr(http.time, "sleep", lambda s: None)
+    for _ in range(8):
+        assert http.get(C(), "https://news.google.com/rss/search", retries=2) is None
+    assert len(calls) == 5 * 2  # 5 failing requests (2 attempts each), then skipped
+    assert http.host_blocked("https://news.google.com/anything")
+    http._failures.clear()

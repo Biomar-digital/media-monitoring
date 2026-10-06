@@ -7,10 +7,13 @@ from .models import Mention, RawArticle
 
 
 def _with_brand(cfg: Config, found: list[str]) -> list[str]:
-    # An executive mention without a brand mention is still about BioMar's people, so
-    # count it toward the brand too. Share of voice should reflect leadership coverage.
-    if cfg.brand not in found and any(cfg.entity(i).type == "executive" for i in found):
-        found.insert(0, cfg.brand)
+    # An executive mention without a company mention is still about that company's people,
+    # so count it toward the executive's company too (BioMar's CEO -> BioMar, Skretting's
+    # CEO -> Skretting).
+    for i in list(found):
+        e = cfg.entity(i)
+        if e.type == "executive" and e.company and e.company not in found:
+            found.insert(0, e.company)
     return found
 
 
@@ -61,8 +64,8 @@ def headline_entities(cfg: Config, m: Mention) -> list[str] | None:
     if not named:
         return None
     # Executives are rarely in headlines (they come from people-quoted data or executive
-    # searches), so they stay as long as the headline is about BioMar.
-    execs = [e for e in m.entities if e in cfg.entity_ids and cfg.entity(e).type == "executive"] if cfg.brand in named else []
+    # searches), so they stay as long as the headline is about their company.
+    execs = [e for e in m.entities if e in cfg.entity_ids and cfg.entity(e).type == "executive" and cfg.entity(e).company in named]
     return [e for e in cfg.entity_ids if e in named or e in execs]
 
 

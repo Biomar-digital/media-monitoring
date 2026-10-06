@@ -24,12 +24,19 @@ HISTORY_DAYS: int | None = None  # None = everything on record
 NEUTRAL_ORIGINS = {"sitemap", "rss", "sweep"}
 
 
-def _brand_only_via_executive(cfg: Config, m) -> bool:
-    """BioMar is attached only because an executive is named (competitors' executives
-    aren't tracked, so these don't count in like-for-like comparisons)."""
-    return (cfg.brand in m.entities and m.matched_by == "headline"
-            and not cfg.entity(cfg.brand).named_in(m.title)
-            and any(cfg.entity(e).type == "executive" for e in m.entities if e in cfg.entity_ids))
+def _companies_only_via_executive(cfg: Config, m) -> list[str]:
+    """Companies attached only because one of their executives is named (not the company
+    itself). Left out of company comparisons so executive tracking depth doesn't skew them."""
+    out = []
+    for e in m.entities:
+        if e not in cfg.entity_ids or cfg.entity(e).type == "executive":
+            continue
+        ent = cfg.entity(e)
+        via_exec = any(cfg.entity(x).type == "executive" and cfg.entity(x).company == e
+                       for x in m.entities if x in cfg.entity_ids)
+        if via_exec and not ent.named_in(m.title) and not ent.named_in(m.snippet or ""):
+            out.append(e)
+    return out
 
 
 def confirmed(m) -> bool:
@@ -72,7 +79,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             # articles regardless of how often it's searched; and the company is named in the
             # headline or confirmed in the body (unverified full-text matches are too noisy).
             "cmp": bool(set(m.origins) & NEUTRAL_ORIGINS),
-            "bx": _brand_only_via_executive(cfg, m),
+            "vx": _companies_only_via_executive(cfg, m) or None,
         }
         for m in mentions
     ]

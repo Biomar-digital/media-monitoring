@@ -38,7 +38,20 @@ Each run also writes a **daily briefing**: a short, plain-language summary of th
 | Where / what | BioMar coverage by publisher country and by topic |
 | All coverage | Searchable, filterable list of every article with English translation and summary, plus CSV export |
 
-Filters for date range (24 hours to all time), region and stock-data pages apply to everything on the page.
+Filters for period, company, region and stock-data pages apply to everything on the page:
+
+- **Period**: rolling (last 24 hours, 7, 30, 90, 180 days, 12 months), calendar (quarter to
+  date, last quarter, year to date, last year) or all time. Comparisons use the previous
+  equivalent period (the previous quarter or year for calendar periods).
+- **Company**: BioMar or any competitor. Mentions, sentiment, executives, needs-attention,
+  markets and topics follow the company in focus. The **Competitor overview** table shows
+  every company side by side; clicking one focuses the page on it.
+
+Competitors are tracked to the same depth as BioMar: name searches, local-language searches
+and their key executives (CEO, CFO, chair, feed-division head; researched October 2026 and
+listed in the watchlist with each executive's `company`). An executive's coverage counts
+toward their company; for Mowi's group executives only feed-related coverage counts toward
+Mowi Feed.
 The dashboard works in light and dark mode and on phones.
 
 ## Setting it up (one time, about 15 minutes)
@@ -206,6 +219,13 @@ SeafoodSource) appear only when Google News or GDELT index them.
 **Cost:** on a typical day there are a few dozen new articles, so the run makes a handful of
 Claude calls plus one briefing call, a few dollars a month at most. Each run analyses at
 most 400 articles (`--limit`).
+
+## Reliability
+
+Each run collects source by source (publisher feeds and sitemaps first, then Google News and
+GDELT) and saves after every source. A server that fails 5 times in a row is skipped for
+the rest of the run (Google News sometimes refuses GitHub's servers). The workflow always
+commits and publishes what was collected, even if a step times out.
 
 ## Running locally
 

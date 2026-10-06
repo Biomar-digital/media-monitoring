@@ -45,6 +45,8 @@ class Entity:
     needs_industry_context: bool = False
     # False: only count articles whose headline names the company (no full-text matches).
     full_text_matches: bool = True
+    # Executives: id of the company they belong to (defaults to the brand).
+    company: str | None = None
 
     def __post_init__(self) -> None:
         self._alias_re = _phrase_pattern(self.aliases or [self.name])
@@ -75,6 +77,7 @@ class Entity:
             "type": self.type,
             "role": self.role,
             "color_slot": self.color_slot,
+            "company": self.company,
         }
 
 
@@ -148,11 +151,17 @@ class Config:
 def load_config(path: Path | str = DEFAULT_CONFIG) -> Config:
     raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     entities = [Entity(**e) for e in raw["entities"]]
+    for e in entities:
+        if e.type == "executive" and not e.company:
+            e.company = raw["brand"]
     ids = [e.id for e in entities]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate entity ids in watchlist")
     if raw["brand"] not in ids:
         raise ValueError(f"brand '{raw['brand']}' is not an entity id")
+    for e in entities:
+        if e.type == "executive" and e.company not in ids:
+            raise ValueError(f"executive '{e.id}' belongs to unknown company '{e.company}'")
     return Config(
         brand=raw["brand"],
         entities=entities,

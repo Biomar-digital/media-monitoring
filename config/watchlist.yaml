@@ -77,6 +77,151 @@ entities:
     aliases: ["Sif Rishøj", "Sif Rishoj"]
     require_context: ["BioMar", "aquaculture"]
 
+  # --- Competitor executives (researched Oct 2026; same depth as BioMar's) ----
+  - id: maarten-bijl
+    name: Maarten Bijl
+    role: CEO, Skretting
+    type: executive
+    company: skretting
+    queries: ['"Maarten Bijl" Skretting']
+    aliases: ["Maarten Bijl"]
+    require_context: ["Skretting", "Nutreco", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: bastiaan-van-tilburg
+    name: Bastiaan van Tilburg
+    role: CEO, Nutreco (Skretting's parent)
+    type: executive
+    company: skretting
+    queries: ['"Bastiaan van Tilburg" Skretting']
+    aliases: ["Bastiaan van Tilburg", "Bastiaan Van Tilburg"]
+    require_context: ["Skretting", "Nutreco", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: helene-ziv-douki
+    name: Helene Ziv-Douki
+    role: SVP Cargill Animal Nutrition & Health, EMEA & Global Salmon
+    type: executive
+    company: cargill-aqua
+    queries: ['"Helene Ziv-Douki" Cargill']
+    aliases: ["Helene Ziv-Douki", "Helene Ziv Douki", "Hélène Ziv-Douki"]
+    require_context: ["Cargill", "EWOS", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: tarjei-eide
+    name: Tarjei Eide
+    role: MD, Cargill Aqua Nutrition North Sea & Canada
+    type: executive
+    company: cargill-aqua
+    queries: ['"Tarjei Eide" Cargill']
+    aliases: ["Tarjei Eide"]
+    require_context: ["Cargill", "EWOS", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: atle-kvist
+    name: Atle Kvist
+    role: COO Feed, Mowi
+    type: executive
+    company: mowi-feed
+    queries: ['"Atle Kvist" Mowi']
+    aliases: ["Atle Kvist"]
+    require_context: ["Mowi", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: ivan-vindheim
+    name: Ivan Vindheim
+    role: CEO, Mowi ASA
+    type: executive
+    company: mowi-feed
+    queries: ['"Ivan Vindheim" Mowi']
+    aliases: ["Ivan Vindheim"]
+    require_context: ["feed", "fôr", "fiskefôr", "fôrfabrikk", "fôrdivisjon", "pienso", "alimento"]  # Mowi parent: feed-related coverage only
+
+  - id: kristian-ellingsen
+    name: Kristian Ellingsen
+    role: CFO, Mowi ASA
+    type: executive
+    company: mowi-feed
+    queries: ['"Kristian Ellingsen" Mowi']
+    aliases: ["Kristian Ellingsen"]
+    require_context: ["feed", "fôr", "fiskefôr", "fôrfabrikk", "fôrdivisjon", "pienso", "alimento"]  # Mowi parent: feed-related coverage only
+
+  - id: leif-teksum
+    name: Leif Teksum
+    role: Chair, Mowi ASA
+    type: executive
+    company: mowi-feed
+    queries: ['"Leif Teksum" Mowi']
+    aliases: ["Leif Teksum"]
+    require_context: ["feed", "fôr", "fiskefôr", "fôrfabrikk", "fôrdivisjon", "pienso", "alimento"]  # Mowi parent: feed-related coverage only
+
+  - id: anders-caroe-bylling
+    name: Anders Carøe Bylling
+    role: Group CEO, Aller Aqua
+    type: executive
+    company: aller-aqua
+    queries: ['"Anders Carøe Bylling" Aller Aqua']
+    aliases: ["Anders Carøe Bylling", "Anders Caroe Bylling", "Anders Bylling"]
+    require_context: ["Aller Aqua", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: hans-erik-bylling
+    name: Hans Erik Bylling
+    role: Group President & owner, Aller Aqua
+    type: executive
+    company: aller-aqua
+    queries: ['"Hans Erik Bylling" Aller Aqua']
+    aliases: ["Hans Erik Bylling", "Hans-Erik Bylling"]
+    require_context: ["Aller Aqua", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: carsten-jorgensen
+    name: Carsten Jørgensen
+    role: Group VP & CFO, Aller Aqua
+    type: executive
+    company: aller-aqua
+    queries: ['"Carsten Jørgensen" Aller Aqua']
+    aliases: ["Carsten Jørgensen", "Carsten Jorgensen", "Carsten Joergensen"]
+    require_context: ["Aller Aqua"]
+
+  - id: fabricio-vargas
+    name: Fabricio Vargas
+    role: CEO, Vitapro
+    type: executive
+    company: vitapro
+    queries: ['"Fabricio Vargas" Vitapro']
+    aliases: ["Fabricio Vargas", "Fabricio Vargas Elías", "Fabricio Vargas Elias"]
+    require_context: ["Vitapro", "Nicovita", "Salmofood"]
+
+  - id: manuel-romero-valdez
+    name: Manuel Romero Valdez
+    role: Chair, Vitapro
+    type: executive
+    company: vitapro
+    queries: ['"Manuel Romero Valdez" Vitapro']
+    aliases: ["Manuel Romero Valdez", "Manuel Enrique Romero Valdez"]
+    require_context: ["Vitapro", "Nicovita", "Alicorp"]
+
+  - id: gabor-fluit
+    name: Gabor Fluit
+    role: CEO, Royal De Heus
+    type: executive
+    company: de-heus
+    queries: ['"Gabor Fluit" De Heus']
+    aliases: ["Gabor Fluit"]
+    require_context: ["De Heus", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: co-de-heus
+    name: Co de Heus
+    role: Co-Chair, Royal De Heus
+    type: executive
+    company: de-heus
+    queries: ['"Co de Heus" De Heus']
+    aliases: ["Co de Heus", "Co De Heus"]
+    require_context: ["De Heus", "aquaculture", "aquafeed", "fish feed", "salmon", "shrimp", "fôr", "laks", "havbruk", "acuicultura", "salmón", "camarón"]
+
+  - id: xue-hua
+    name: Xue Hua
+    role: Chairman & President, Haid Group
+    type: executive
+    company: haid-group
+    queries: ['"Xue Hua" Haid']
+    aliases: ["Xue Hua", "薛华", "薛華"]
+    require_context: ["Haid", "海大"]
+
   # --- Competitors ----------------------------------------------------------
   - id: skretting
     name: Skretting

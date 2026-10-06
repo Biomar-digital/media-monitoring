@@ -47,7 +47,28 @@ def reclassify(cfg, mentions) -> None:
 
 
 def cmd_collect(cfg, store: Store, sources: list[str], window_days: int, verify_new: bool = True) -> int:
-    queries = [(e.id, q) for e in cfg.entities for q in e.queries]
+    """Collect from each source in turn, saving after every source, so a slow or blocked
+    source (Google News throttling GitHub's runners) can't lose what the others found.
+    Publisher sources (RSS, sitemaps) run first."""
+    mentions = store.load_all()
+    discarded = store.load_discarded()
+    new_total: list[str] = []
+    bodies: dict[str, str] = {}
+
+    def absorb(label: str, raws: list) -> None:
+        nonlocal mentions
+        bodies.update({r.key: r.body for r in raws if r.body})
+        mentions, new_ids = merge_raw(cfg, mentions, raws, discarded)
+        new_total.extend(new_ids)
+        reclassify(cfg, mentions)
+        store.save(mentions)
+        log.info("%s: %d scanned, %d new mentions", label, len(raws), len(new_ids))
+
+    def step(label: str, fn) -> None:
+        try:
+            absorb(label, fn())
+        except Exception:  # one broken source must not stop the others
+            log.exception("%s failed", label)
 
     def local_queries(edition):
         # Brand and competitors with local industry words, e.g. "Skretting" fôr.
@@ -55,36 +76,8 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int, verify_
         return [(e.id, f'"{e.aliases[0] if e.aliases else e.name}" {t}')
                 for e in cfg.entities if e.type != "executive" for t in terms]
 
-    raws = []
-    if "google_news" in sources:
-        found = google_news.search(queries, cfg.google_news_editions, days=window_days, local_queries=local_queries)
-        log.info("google_news: %d results", len(found))
-        raws += found
-        if cfg.country_domain_searches:
-            # e.g. "BioMar" site:dk through the US edition (Google has no Danish edition).
-            found = []
-            for tld, country, lang in cfg.country_domain_searches:
-                qs = [(e.id, f'"{e.aliases[0] if e.aliases else e.name}" site:{tld}')
-                      for e in cfg.entities if e.type != "executive"]
-                found += google_news.search(qs, [(country, lang)], days=window_days)
-            for a in found:
-                a.country = google_news.country_from_domain(a.source_domain) or a.country
-            log.info("country-domain searches: %d results", len(found))
-            raws += found
-        if cfg.site_sweeps:
-            found = google_news.sweep(cfg.site_sweeps, days=window_days)
-            log.info("site sweeps: %d articles scanned", len(found))
-            raws += found
-    if "gdelt" in sources:
-        # GDELT's OR groups only accept simple terms, so search each entity's primary alias.
-        terms = list(dict.fromkeys(f'"{e.aliases[0] if e.aliases else e.name}"' for e in cfg.entities))
-        found = gdelt.search(terms, timespan=f"{window_days}d")
-        log.info("gdelt: %d results", len(found))
-        raws += found
     if "rss" in sources and cfg.rss_feeds:
-        found = rss.fetch(cfg.rss_feeds)
-        log.info("rss: %d items scanned", len(found))
-        raws += found
+        step("rss", lambda: rss.fetch(cfg.rss_feeds))
     if "sitemaps" in sources and cfg.sitemaps:
         def candidate(text):
             # Same alias/context rules as headlines (so "Mowi" salmon-farming URLs aren't
@@ -93,20 +86,37 @@ def cmd_collect(cfg, store: Store, sources: list[str], window_days: int, verify_
                 if e.matches(text):
                     return e.id
             return None
-        known = {m.url for m in store.load_all().values()}
-        found = sitemaps.fetch(cfg.sitemaps, days=window_days, candidate=candidate, known_urls=known)
-        log.info("sitemaps: %d articles", len(found))
-        raws += found
-    bodies = {r.key: r.body for r in raws if r.body}
-    mentions, new_ids = merge_raw(cfg, store.load_all(), raws, store.load_discarded())
-    if verify_new:
-        vstats = verify(cfg, mentions, new_ids, bodies)
+        known = {m.url for m in mentions.values()}
+        step("sitemaps", lambda: sitemaps.fetch(cfg.sitemaps, days=window_days, candidate=candidate, known_urls=known))
+    if "google_news" in sources:
+        if cfg.site_sweeps:
+            step("site sweeps", lambda: google_news.sweep(cfg.site_sweeps, days=window_days))
+        queries = [(e.id, q) for e in cfg.entities for q in e.queries]
+        step("google_news", lambda: google_news.search(queries, cfg.google_news_editions, days=window_days, local_queries=local_queries))
+        if cfg.country_domain_searches:
+            def domain_searches():
+                # e.g. "BioMar" site:dk through the US edition (Google has no Danish edition).
+                found = []
+                for tld, country, lang in cfg.country_domain_searches:
+                    qs = [(e.id, f'"{e.aliases[0] if e.aliases else e.name}" site:{tld}')
+                          for e in cfg.entities if e.type != "executive"]
+                    found += google_news.search(qs, [(country, lang)], days=window_days)
+                for a in found:
+                    a.country = google_news.country_from_domain(a.source_domain) or a.country
+                return found
+            step("country-domain searches", domain_searches)
+    if "gdelt" in sources:
+        # GDELT's OR groups only accept simple terms, so search each entity's primary alias.
+        terms = list(dict.fromkeys(f'"{e.aliases[0] if e.aliases else e.name}"' for e in cfg.entities))
+        step("gdelt", lambda: gdelt.search(terms, timespan=f"{window_days}d"))
+    if verify_new and new_total:
+        vstats = verify(cfg, mentions, new_total, bodies)
         store.add_discarded(vstats.pop("dropped_ids"))
+        reclassify(cfg, mentions)
+        store.save(mentions)
         log.info("verify: %s", vstats)
-    reclassify(cfg, mentions)
-    store.save(mentions)
-    log.info("collect: %d new mentions (%d stored)", len(new_ids), len(mentions))
-    return len(new_ids)
+    log.info("collect: %d new mentions (%d stored)", len(new_total), len(mentions))
+    return len(new_total)
 
 
 def cmd_analyse(cfg, store: Store, limit: int) -> None:

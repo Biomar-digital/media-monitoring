@@ -68,7 +68,8 @@
   let DATA = null;
   let ENT = {};          // id -> entity
   const state = {
-    days: store.get("mm.days") != null && !Number.isNaN(Number(store.get("mm.days"))) ? Number(store.get("mm.days")) : 30,  // 0 = all time
+    range: store.get("mm.range") || "30d",
+    focus: null,  // company in focus (defaults to the brand once data loads)
     stock: store.get("mm.stock") === "1",
     region: "",
     trend: null,         // Set of entity ids shown in the trend chart (null = auto)
@@ -133,8 +134,7 @@
     ENT = Object.fromEntries(data.entities.map((e) => [e.id, e]));
     for (const m of data.mentions) m._t = new Date(m.p).getTime();
     $("main").hidden = false;
-    const since = data.tracking_since ? ` since ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(data.tracking_since))}` : "";
-    $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))} · ${nf.format(data.mentions.length)} articles tracked${since}`;
+    $("updated").textContent = `Updated ${dateTimeFmt.format(new Date(data.generated_at))}`;
     setupFilters();
     renderAll();
     let t;
@@ -148,12 +148,49 @@
   const now = () => Date.now();
   function inRange(m, from, to) { return m._t >= from && m._t < to; }
   const sinceT = () => (DATA.tracking_since ? new Date(DATA.tracking_since).getTime() : now());
-  // Days covered by the selected range; "All time" (0) spans back to the first article.
-  const rangeDays = () => state.days || Math.max(1, Math.ceil((now() - sinceT()) / DAY) + 1);
+
+  // Periods: rolling windows, calendar quarters/years (local time), and all time.
+  // `prev` is the comparison period: the previous quarter/year for calendar periods
+  // (to the same point for "to date"), otherwise the window just before.
+  const quarterStart = (d) => new Date(d.getFullYear(), Math.floor(d.getMonth() / 3) * 3, 1);
+  const RANGES = [
+    { id: "1d", label: "Last 24 hours", short: "24 hours", days: 1 },
+    { id: "7d", label: "Last 7 days", short: "7 days", days: 7 },
+    { id: "30d", label: "Last 30 days", short: "30 days", days: 30 },
+    { id: "90d", label: "Last 90 days", short: "90 days", days: 90 },
+    { id: "180d", label: "Last 180 days", short: "180 days", days: 180 },
+    { id: "365d", label: "Last 12 months", short: "12 months", days: 365 },
+    { id: "qtd", label: "Quarter to date", short: "quarter to date" },
+    { id: "lq", label: "Last quarter", short: "quarter" },
+    { id: "ytd", label: "Year to date", short: "year to date" },
+    { id: "ly", label: "Last year", short: "year" },
+    { id: "all", label: "All time", short: "all time" },
+  ];
+  const rangeDef = () => RANGES.find((x) => x.id === state.range) || RANGES[2];
+  function bounds(offset = 0) {
+    const R = rangeDef(), n = new Date(), t = now();
+    let from, to;
+    if (R.days) { to = t - offset * R.days * DAY; from = to - R.days * DAY; }
+    else if (R.id === "qtd") {
+      const qs = quarterStart(n);
+      from = new Date(qs.getFullYear(), qs.getMonth() - 3 * offset, 1).getTime();
+      to = offset ? from + (t - qs.getTime()) : t;
+    } else if (R.id === "lq") {
+      const qs = quarterStart(n);
+      from = new Date(qs.getFullYear(), qs.getMonth() - 3 * (offset + 1), 1).getTime();
+      to = new Date(qs.getFullYear(), qs.getMonth() - 3 * offset, 1).getTime();
+    } else if (R.id === "ytd") {
+      from = new Date(n.getFullYear() - offset, 0, 1).getTime();
+      to = offset ? from + (t - new Date(n.getFullYear(), 0, 1).getTime()) : t;
+    } else if (R.id === "ly") {
+      from = new Date(n.getFullYear() - 1 - offset, 0, 1).getTime();
+      to = new Date(n.getFullYear() - offset, 0, 1).getTime();
+    } else { from = sinceT(); to = t + 1; }  // all time
+    return { from, to };
+  }
+  const rangeDays = () => { const b = bounds(0); return Math.max(1, Math.ceil((b.to - b.from) / DAY)); };
   function slice(offsetPeriods = 0) {
-    const span = rangeDays() * DAY;
-    const to = now() - offsetPeriods * span;
-    const from = to - span;
+    const { from, to } = bounds(offsetPeriods);
     return DATA.mentions.filter((m) => inRange(m, from, to) && (!state.region || regionOf(m.c) === state.region) && (state.stock || m.k !== "stock"));
   }
   // Region filter: BioMar's markets, with the rest of Europe grouped and everything else
@@ -172,6 +209,8 @@
   }
   const ofType = (t) => DATA.entities.filter((e) => e.type === t);
   const brandId = () => DATA.brand;
+  const focusId = () => state.focus || DATA.brand;
+  const execsOf = (cid) => ofType("executive").filter((e) => (e.company || DATA.brand) === cid);
   const companies = () => [ENT[brandId()], ...ofType("competitor")];
 
   // Like-for-like coverage for company comparisons: articles from sources that read
@@ -181,7 +220,7 @@
   // BioMar-only history would inflate BioMar's share.
   function comparable(ms) {
     const b = brandId();
-    return ms.filter((m) => m.cmp !== false).map((m) => (m.bx ? { ...m, e: m.e.filter((x) => x !== b) } : m));
+    return ms.filter((m) => m.cmp !== false).map((m) => (m.vx ? { ...m, e: m.e.filter((x) => !m.vx.includes(x)) } : m));
   }
   function countBy(ms, ids) {
     const c = Object.fromEntries(ids.map((i) => [i, 0]));
@@ -199,15 +238,19 @@
   // Filters
   // ---------------------------------------------------------------------------------
   function setupFilters() {
-    const seg = $("rangeSeg");
-    for (const b of seg.querySelectorAll("button")) {
-      b.addEventListener("click", () => {
-        state.days = Number(b.dataset.days);
-        store.set("mm.days", String(state.days));
-        state.feed.page = 0;
-        renderAll();
-      });
-    }
+    const rs = $("rangeSel");
+    rs.replaceChildren(
+      h("optgroup", { label: "Rolling" }, RANGES.filter((x) => x.days).map((x) => h("option", { value: x.id, text: x.label }))),
+      h("optgroup", { label: "Calendar" }, RANGES.filter((x) => ["qtd", "lq", "ytd", "ly"].includes(x.id)).map((x) => h("option", { value: x.id, text: x.label }))),
+      h("option", { value: "all", text: "All time" }));
+    if (!RANGES.some((x) => x.id === state.range)) state.range = "30d";
+    rs.value = state.range;
+    rs.addEventListener("change", () => { state.range = rs.value; store.set("mm.range", state.range); state.feed.page = 0; renderAll(); });
+    const fs = $("focusSel");
+    fs.replaceChildren(...companies().map((e) => h("option", { value: e.id, text: e.id === DATA.brand ? `${e.name} (us)` : e.name })));
+    state.focus = companies().some((e) => e.id === store.get("mm.focus")) ? store.get("mm.focus") : DATA.brand;
+    fs.value = state.focus;
+    fs.addEventListener("change", () => setFocus(fs.value));
     const sc = $("stockChk");
     sc.checked = state.stock;
     sc.addEventListener("change", () => { state.stock = sc.checked; store.set("mm.stock", sc.checked ? "1" : "0"); state.feed.page = 0; renderAll(); });
@@ -238,9 +281,22 @@
     state.stock = keep;
     $("stockCount").textContent = `(${nf.format(n)} in this period)`;
   }
+  function setFocus(id) {
+    state.focus = id;
+    store.set("mm.focus", id);
+    $("focusSel").value = id;
+    if (state.trend && !state.trend.has(id)) state.trend.add(id);
+    renderAll();
+  }
   function renderAll() {
     renderStockCount();
-    for (const b of $("rangeSeg").querySelectorAll("button")) b.setAttribute("aria-checked", String(Number(b.dataset.days) === state.days));
+    const fname = ENT[focusId()].name;
+    $("geoTitle").textContent = `Where ${fname} is covered`;
+    $("geoSub").textContent = `${fname} mentions by market (publisher country)`;
+    $("topicTitle").textContent = `What ${fname} coverage is about`;
+    $("topicSub").textContent = `${fname} mentions by topic`;
+    $("attnSub").textContent = `Negative or high-importance coverage of ${fname} and its people`;
+    renderCompetitorTable();
     renderBriefing();
     renderTiles();
     renderCharts();
@@ -309,13 +365,13 @@
     const arrow = d > 0 ? "▲" : d < 0 ? "▼" : "";
     return h("div", { class: "delta" }, h("span", { class: cls, text: `${arrow} ${signed(d)}${unit}` }), ` vs previous ${periodName()}`);
   }
-  const periodName = () => (state.days === 0 ? "all time" : state.days === 1 ? "24 hours" : state.days === 365 ? "12 months" : `${state.days} days`);
+  const periodName = () => rangeDef().short;
   function renderTiles() {
     const cur = slice(0);
     // Only compare with the previous period if we were already collecting back then.
-    const hasPrev = state.days > 0 && now() - 2 * state.days * DAY >= sinceT() - DAY;
+    const hasPrev = state.range !== "all" && bounds(1).from >= sinceT() - DAY;
     const prev = hasPrev ? slice(1) : null;
-    const bid = brandId();
+    const bid = focusId();
     const ids = companies().map((e) => e.id);
     const cc = countBy(cur, ids), pc = prev ? countBy(prev, ids) : null;
     const sc = countBy(comparable(cur), ids), spc = prev ? countBy(comparable(prev), ids) : null;
@@ -324,7 +380,7 @@
     const sov = total ? sc[bid] / total : 0;
     const psov = spc && ptotal ? spc[bid] / ptotal : null;
     const tone = toneBy(cur, bid), ptone = prev ? toneBy(prev, bid) : null;
-    const execIds = ofType("executive").map((e) => e.id);
+    const execIds = execsOf(bid).map((e) => e.id);
     const ex = cur.filter((m) => m.e.some((e) => execIds.includes(e))).length;
     const pex = prev ? prev.filter((m) => m.e.some((e) => execIds.includes(e))).length : null;
     const attn = attentionItems(cur).length;
@@ -332,9 +388,9 @@
     const tiles = $("tiles");
     tiles.replaceChildren(
       h("div", { class: "tile hero" },
-        h("p", { class: "label", text: state.days ? `BioMar mentions · last ${periodName()}` : "BioMar mentions · all time" }),
+        h("p", { class: "label", text: `${ENT[bid].name} mentions · ${rangeDef().label.toLowerCase()}` }),
         h("div", { class: "value", text: fmt(cc[bid]) }),
-        delta(cc[bid], pc ? pc[bid] : null, { label: state.days ? "Comparison appears once a full previous period is tracked" : `Since ${new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" }).format(new Date(sinceT()))}` }),
+        delta(cc[bid], pc ? pc[bid] : null, { label: state.range !== "all" ? "Comparison appears once a full previous period is tracked" : `Since ${new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" }).format(new Date(sinceT()))}` }),
         sparkline(cur, bid)),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Share of voice" }),
@@ -350,8 +406,8 @@
         delta(tone.net, ptone && ptone.n ? ptone.net : null, { unit: " pts" })),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Executive mentions" }),
-        h("div", { class: "value", text: fmt(ex) }),
-        delta(ex, pex)),
+        h("div", { class: "value", text: execIds.length ? fmt(ex) : "–" }),
+        execIds.length ? delta(ex, pex) : h("div", { class: "delta", text: "No executives tracked yet" })),
       h("div", { class: "tile" },
         h("p", { class: "label", text: "Needs attention" }),
         h("div", { class: "value" }, attn ? h("span", { class: "attn-icon", "aria-hidden": "true", text: "! " }) : null, fmt(attn)),
@@ -364,10 +420,11 @@
   const MONTH = 30.4375 * DAY;
   const monthFmt = new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" });
   function buckets() {
-    const end = now(), days = rangeDays();
-    const step = days === 1 ? 3600000 : days <= 45 ? DAY : days <= 550 ? 7 * DAY : MONTH;
-    const n = Math.ceil((days * DAY) / step);
-    const start = end - n * step;
+    const { from, to } = bounds(0), days = rangeDays();
+    const step = days <= 1 ? 3600000 : days <= 45 ? DAY : days <= 550 ? 7 * DAY : MONTH;
+    const n = Math.max(1, Math.ceil((to - from) / step));
+    // Rolling windows end now; calendar periods start on their first day.
+    const start = rangeDef().days ? to - n * step : from;
     return { start, step, n, label: (i) => {
       const d = new Date(start + i * step);
       return step === 3600000 ? hourFmt.format(d) : step === DAY ? dateFmt.format(d) : step === MONTH ? monthFmt.format(d) : `Week of ${dateFmt.format(d)}`;
@@ -483,11 +540,11 @@
     // Below the threshold, show counts: a percentage of a handful of articles misleads.
     const rows = ids.map((id) => ({
       id, label: ENT[id].name, value: c[id],
-      color: id === brandId() ? "var(--series-1)" : "var(--de-emph)",
+      color: id === brandId() ? "var(--series-1)" : id === focusId() ? colorOf(id) : "var(--de-emph)",
       valueText: total ? `${pct(c[id] / total)} (${nf.format(c[id])})` : "0",
       tip: [{ k: "Share of voice", v: total ? pct(c[id] / total) : "–" }, { k: "Articles", v: nf.format(c[id]) }],
     })).sort((a, b) => b.value - a.value);
-    if (total) hbars($("sovChart"), rows, { highlight: brandId() }); else empty($("sovChart"), "No like-for-like articles in this period yet.");
+    if (total) hbars($("sovChart"), rows, { highlight: focusId() }); else empty($("sovChart"), "No like-for-like articles in this period yet.");
     $("sovChart").append(h("p", { class: "note small", text:
       `Based on ${nf.format(total)} articles (article counts in brackets). ` +
       (enough ? "" : `Small sample: with fewer than ${MIN_SOV} articles a single story moves these shares a lot, so read them as indicative. `) +
@@ -513,7 +570,7 @@
     const segs = [["negative", "var(--neg)", "Negative"], ["neutral", "var(--neu)", "Neutral"], ["positive", "var(--pos)", "Positive"]];
     rows.forEach((r, i) => {
       const y = pad + i * rowH + (rowH - barH) / 2;
-      const strong = r.e.id === brandId();
+      const strong = r.e.id === focusId();
       svg.append(s("text", { x: lw - 8, y: y + barH / 2 + 4, "text-anchor": "end", class: strong ? "label-strong" : null, text: truncate(r.e.name, lw) }));
       let x0 = lw + 1;
       const present = segs.filter(([k]) => r.t[k] > 0);
@@ -551,7 +608,8 @@
     if (state.trend) return [...state.trend];
     const comps = ofType("competitor").map((e) => e.id);
     const c = countBy(ms, comps);
-    return [brandId(), ...comps.sort((a, b) => c[b] - c[a]).slice(0, 3)];
+    const top = comps.sort((a, b) => c[b] - c[a]).filter((x) => x !== focusId()).slice(0, 3);
+    return [...new Set([brandId(), focusId(), ...top])];
   }
   function renderTrend() {
     const el = $("trendChart");
@@ -640,7 +698,7 @@
   // ---------------------------------------------------------------------------------
   // Geography & topics (BioMar only, single series)
   // ---------------------------------------------------------------------------------
-  function brandSlice() { return slice(0).filter((m) => m.e.includes(brandId())); }
+  function brandSlice() { return slice(0).filter((m) => m.e.includes(focusId())); }
   function renderGeo() {
     const c = {};
     for (const m of brandSlice()) { const k = regionOf(m.c); c[k] = (c[k] || 0) + 1; }
@@ -657,11 +715,47 @@
   }
 
   // ---------------------------------------------------------------------------------
+  // Competitor overview: every company side by side; click to focus the page on it.
+  // ---------------------------------------------------------------------------------
+  function renderCompetitorTable() {
+    const cur = slice(0);
+    const hasPrev = state.range !== "all" && bounds(1).from >= sinceT() - DAY;
+    const prev = hasPrev ? slice(1) : null;
+    const ids = companies().map((e) => e.id);
+    const cc = countBy(cur, ids), pc = prev ? countBy(prev, ids) : null;
+    const lf = countBy(comparable(cur), ids);
+    const lfTotal = ids.reduce((a, i) => a + lf[i], 0);
+    const label = Object.fromEntries(MARKETS);
+    const rows = ids.map((id) => {
+      const mine = cur.filter((m) => m.e.includes(id));
+      const markets = {};
+      for (const m of mine) { const k = regionOf(m.c); markets[k] = (markets[k] || 0) + 1; }
+      const topMarket = Object.entries(markets).sort((a, b) => b[1] - a[1])[0];
+      return { id, n: cc[id], d: pc ? cc[id] - pc[id] : null, share: lfTotal ? lf[id] / lfTotal : null, lfN: lf[id],
+               tone: toneBy(cur, id), market: topMarket ? label[topMarket[0]] : "–", latest: mine[0] };
+    }).sort((a, b) => b.n - a.n);
+    const tr = (r) => h("tr", { class: r.id === focusId() ? "focus" : null },
+      h("td", {}, h("button", { class: "linkish", type: "button", onclick: () => { setFocus(r.id); $("tiles").scrollIntoView({ behavior: "smooth", block: "start" }); } },
+        h("span", { class: "swatch", style: `background:${colorOf(r.id)}` }), ENT[r.id].name)),
+      h("td", { class: "num", text: nf.format(r.n) }),
+      h("td", { class: "num" }, r.d == null ? "–" : h("span", { class: r.d > 0 ? "up" : r.d < 0 ? "down" : "", text: signed(r.d) })),
+      h("td", { class: "num", text: r.share == null ? "–" : `${pct(r.share)} (${r.lfN})` }),
+      h("td", { class: "num", text: r.tone.n ? signed(r.tone.net) : "–" }),
+      h("td", { text: r.market }),
+      h("td", {}, r.latest ? h("a", { href: r.latest.u, target: "_blank", rel: "noopener noreferrer", class: "small", text: r.latest.t }) : h("span", { class: "muted small", text: "No coverage in period" })));
+    $("cmpTable").replaceChildren(h("div", { class: "table-wrap" }, h("table", { class: "delta-table" },
+      h("thead", {}, h("tr", {}, h("th", { text: "Company" }), h("th", { class: "num", text: "Mentions" }),
+        h("th", { class: "num", text: `vs previous ${periodName()}` }), h("th", { class: "num", text: "Share of voice" }),
+        h("th", { class: "num", text: "Net sentiment" }), h("th", { text: "Top market" }), h("th", { text: "Latest" }))),
+      h("tbody", {}, rows.map(tr)))));
+  }
+
+  // ---------------------------------------------------------------------------------
   // Executives table
   // ---------------------------------------------------------------------------------
   function renderExecutives() {
     const ms = slice(0);
-    const execs = ofType("executive").map((e) => {
+    const execs = execsOf(focusId()).map((e) => {
       const mine = ms.filter((m) => m.e.includes(e.id));
       return { e, t: toneBy(ms, e.id), latest: mine[0] };
     }).sort((a, b) => b.t.n - a.t.n);
@@ -670,6 +764,10 @@
       h("td", { class: "num", text: nf.format(t.n) }),
       h("td", { class: "num", text: t.n ? signed(t.net) : "–" }),
       h("td", {}, latest ? h("a", { href: latest.u, target: "_blank", rel: "noopener noreferrer", class: "small", text: latest.t }) : h("span", { class: "muted small", text: "No coverage in period" }))));
+    if (!execs.length) {
+      $("execTable").replaceChildren(h("div", { class: "empty", text: `No executives tracked for ${ENT[focusId()].name} yet.` }));
+      return;
+    }
     $("execTable").replaceChildren(h("div", { class: "table-wrap" }, h("table", {},
       h("thead", {}, h("tr", {}, h("th", { text: "Person" }), h("th", { class: "num", text: "Mentions" }), h("th", { class: "num", text: "Net" }), h("th", { text: "Latest" }))),
       h("tbody", {}, rows))));
@@ -678,7 +776,7 @@
   // ---------------------------------------------------------------------------------
   // Attention list & feed
   // ---------------------------------------------------------------------------------
-  const ownIds = () => [brandId(), ...ofType("executive").map((e) => e.id)];
+  const ownIds = () => [focusId(), ...execsOf(focusId()).map((e) => e.id)];
   function attentionItems(ms) {
     const own = ownIds();
     return ms.filter((m) => m.e.some((e) => own.includes(e)) && (m.im >= 3 || own.some((e) => m.e.includes(e) && (m.se[e] ?? 0) <= -0.25)));
@@ -689,7 +787,7 @@
     return h("span", { class: `tone ${t}`, title: `Sentiment toward ${ENT[id] ? ENT[id].name : id}: ${sc}` }, h("span", { class: "dot" }), t[0].toUpperCase() + t.slice(1));
   }
   function itemRow(m) {
-    const focus = m.e.includes(brandId()) ? brandId() : m.e[0];
+    const focus = m.e.includes(focusId()) ? focusId() : m.e.includes(brandId()) ? brandId() : m.e[0];
     return h("div", { class: "item" },
       h("a", { class: "title", href: m.u, target: "_blank", rel: "noopener noreferrer", text: m.t }),
       m.o ? h("div", { class: "orig", text: m.o }) : null,

@@ -53,18 +53,26 @@ jobs:
           cache: pip
       - run: pip install -e .
 
-      - name: Collect, analyse, brief
-        # Pushes to main only rebuild the site from stored data; scheduled and manual runs collect.
+      - name: Collect
+        # Pushes only rebuild the site from stored data; scheduled and manual runs collect.
+        # Collection saves after every source, so even a timed-out run keeps what it found.
         if: github.event_name != 'push'
+        timeout-minutes: 50
+        continue-on-error: true
+        run: python -m monitor collect --window-days "${{ inputs.window_days || '2' }}"
+
+      - name: Analyse and brief
+        if: always() && github.event_name != 'push'
+        timeout-minutes: 15
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python -m monitor collect --window-days "${{ inputs.window_days || '2' }}"
           python -m monitor analyse
           python -m monitor brief
 
       - name: Commit data
-        if: github.event_name != 'push'
+        if: always() && github.event_name != 'push'
         run: |
           git config user.name "biomar-media-monitor[bot]"
           git config user.email "media-monitor@users.noreply.github.com"
@@ -78,6 +86,7 @@ jobs:
           fi
 
       - name: Build dashboard
+        if: always()
         env:
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
         run: |
@@ -89,8 +98,11 @@ jobs:
           python -m monitor build
 
       - uses: actions/configure-pages@v5
+        if: always()
       - uses: actions/upload-pages-artifact@v3
+        if: always()
         with:
           path: site
       - id: deploy
+        if: always()
         uses: actions/deploy-pages@v4

@@ -123,6 +123,8 @@ def _range(c, q: str, edition: tuple, start: date, end: date, delay: float) -> l
 def _window(c, q: str, edition: tuple, days: int, delay: float) -> list[RawArticle]:
     """Short windows use Google's when: operator; longer ones explicit date ranges that are
     subdivided whenever a range hits the result cap."""
+    if http.host_blocked(SEARCH_URL):  # Google is refusing us this run: don't wait per query
+        return []
     if days <= 3:
         found = _fetch(c, f"{q} when:{days}d", edition) or []
         time.sleep(delay)
