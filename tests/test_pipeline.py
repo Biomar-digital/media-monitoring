@@ -404,3 +404,16 @@ def test_verify_drops_sidebar_matches(cfg, monkeypatch):
 def test_rss_tolerates_leading_whitespace():
     xml = '﻿  \n<?xml version="1.0"?><rss><channel><item><title>BioMar news</title><link>https://ypaithros.gr/a</link></item></channel></rss>'
     assert len(rss.parse_feed(xml, "Ypaithros")) == 1
+
+
+def test_unconfirmed_matches_hidden_from_dashboard(cfg, tmp_path, monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    st = Store(tmp_path / "data")
+    a = raw("Fiskefôrgigant mot børsnotering", source="Intrafish")
+    a.query_entity = "biomar"  # search hit, BioMar not in headline, unverified
+    b = raw("BioMar opens new feed plant")
+    mentions, _ = merge_raw(cfg, {}, [a, b])
+    st.save(mentions)
+    payload = build.dashboard_payload(cfg, st)
+    titles = [m["t"] for m in payload["mentions"]]
+    assert titles == ["BioMar opens new feed plant"] and payload["unconfirmed_hidden"] == 1

@@ -254,7 +254,8 @@
       (imp ? `, plus ${nf.format(imp)} articles imported from the previous coverage tracker (their sentiment and summaries are kept)` : "") +
       `. Includes articles where the company appears in the text but not the headline (marked “Full-text match”). ` +
       (state.stock ? "Stock-data pages are included. " : "Stock-data pages are excluded; tick “Include stock-data pages” to count them. ") +
-      (lex ? `${nf.format(lex)} articles were scored by the keyword fallback because no Claude API key is configured.` : "");
+      (lex ? `${nf.format(lex)} articles were scored by the keyword fallback because no Claude API key is configured. ` : "") +
+      (DATA.unconfirmed_hidden ? `${nf.format(DATA.unconfirmed_hidden)} articles where a company's name couldn't be confirmed in the headline, standfirst or article text are left out.` : "");
   }
   function renderCharts() {
     renderSov();
@@ -692,7 +693,8 @@
     return h("div", { class: "item" },
       h("a", { class: "title", href: m.u, target: "_blank", rel: "noopener noreferrer", text: m.t }),
       m.o ? h("div", { class: "orig", text: m.o }) : null,
-      m.sm ? h("div", { class: "sum", text: m.sm }) : null,
+      // When the headline doesn't name the company, show the standfirst that does.
+      m.sn ? h("div", { class: "sum", text: m.sn }) : m.sm ? h("div", { class: "sum", text: m.sm }) : null,
       h("div", { class: "meta" },
         toneBadge(m, focus),
         h("span", { text: m.s }),

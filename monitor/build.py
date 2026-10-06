@@ -32,9 +32,18 @@ def _brand_only_via_executive(cfg: Config, m) -> bool:
             and any(cfg.entity(e).type == "executive" for e in m.entities if e in cfg.entity_ids))
 
 
+def confirmed(m) -> bool:
+    """The company is demonstrably mentioned: named in the headline or standfirst, or found
+    in the article text. Unchecked full-text matches (a search engine hit that may come from
+    a sidebar, and imported rows whose headline doesn't name the company) are kept in
+    storage but not shown or counted."""
+    return m.matched_by == "headline" or m.verified == "body"
+
+
 def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HISTORY_DAYS) -> dict:
     source = store.load_since(history_days) if history_days else list(store.load_all().values())
-    mentions = sorted(source, key=lambda m: m.published, reverse=True)
+    hidden = sum(1 for m in source if not confirmed(m))
+    mentions = sorted((m for m in source if confirmed(m)), key=lambda m: m.published, reverse=True)
     rows = [
         {
             "id": m.id,
@@ -50,6 +59,9 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             "se": {k: round(v, 2) for k, v in m.sentiment.items()},
             "tp": m.topics,
             "sm": m.summary,
+            # Standfirst/description: shows where the company is mentioned when the headline doesn't.
+            "sn": (m.snippet[:300] if m.snippet and not any(
+                cfg.entity(e).named_in(m.title) for e in m.entities if e in cfg.entity_ids) else None),
             "im": m.importance,
             "a": m.analysis,
             "mb": m.matched_by,
@@ -59,7 +71,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             # publishes (sitemap, RSS, site sweep), so every company is measured against the same
             # articles regardless of how often it's searched; and the company is named in the
             # headline or confirmed in the body (unverified full-text matches are too noisy).
-            "cmp": bool(set(m.origins) & NEUTRAL_ORIGINS) and (m.matched_by == "headline" or m.verified == "body"),
+            "cmp": bool(set(m.origins) & NEUTRAL_ORIGINS),
             "bx": _brand_only_via_executive(cfg, m),
         }
         for m in mentions
@@ -75,6 +87,7 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
         # Imported history covers BioMar only; competitors are tracked from the first collected article.
         "comparable_since": min((m.published for m in mentions if set(m.origins) & NEUTRAL_ORIGINS), default=None),
         "analysis_methods": dict(Counter(m.analysis for m in mentions)),
+        "unconfirmed_hidden": hidden,
         "briefings": store.latest_briefings(14),
         "mentions": rows,
     }
