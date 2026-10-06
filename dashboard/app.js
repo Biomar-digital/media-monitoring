@@ -718,9 +718,13 @@
   // Competitor overview: every company side by side; click to focus the page on it.
   // ---------------------------------------------------------------------------------
   function renderCompetitorTable() {
-    const cur = slice(0);
-    const hasPrev = state.range !== "all" && bounds(1).from >= sinceT() - DAY;
-    const prev = hasPrev ? slice(1) : null;
+    // Mentions here leave out the imported BioMar-only history, so every company is counted
+    // from the same collection (same searches, sources and executive depth).
+    const tracked = (ms) => ms.filter((m) => !m.io);
+    const cur = tracked(slice(0));
+    const trackedT = DATA.tracked_since ? new Date(DATA.tracked_since).getTime() : now();
+    const hasPrev = state.range !== "all" && bounds(1).from >= trackedT - DAY;
+    const prev = hasPrev ? tracked(slice(1)) : null;
     const ids = companies().map((e) => e.id);
     const cc = countBy(cur, ids), pc = prev ? countBy(prev, ids) : null;
     const lf = countBy(comparable(cur), ids);
@@ -744,7 +748,7 @@
       h("td", { text: r.market }),
       h("td", {}, r.latest ? h("a", { href: r.latest.u, target: "_blank", rel: "noopener noreferrer", class: "small", text: r.latest.t }) : h("span", { class: "muted small", text: "No coverage in period" })));
     $("cmpTable").replaceChildren(h("div", { class: "table-wrap" }, h("table", { class: "delta-table" },
-      h("thead", {}, h("tr", {}, h("th", { text: "Company" }), h("th", { class: "num", text: "Mentions" }),
+      h("thead", {}, h("tr", {}, h("th", { text: "Company" }), h("th", { class: "num", text: "Mentions", title: "Collected by this tracker for every company the same way (imported BioMar history left out)" }),
         h("th", { class: "num", text: `vs previous ${periodName()}` }), h("th", { class: "num", text: "Share of voice" }),
         h("th", { class: "num", text: "Net sentiment" }), h("th", { text: "Top market" }), h("th", { text: "Latest" }))),
       h("tbody", {}, rows.map(tr)))));

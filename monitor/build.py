@@ -47,6 +47,17 @@ def confirmed(m) -> bool:
     return m.matched_by == "headline" or m.verified == "body"
 
 
+BACKFILL_DAYS = 180  # look-back of the initial Google News backfill
+
+
+def _tracked_since(mentions) -> str | None:
+    from datetime import timedelta
+    first = min((m.collected for m in mentions if m.origins != ["import"]), default=None)
+    if not first:
+        return None
+    return (datetime.fromisoformat(first) - timedelta(days=BACKFILL_DAYS)).isoformat(timespec="seconds")
+
+
 def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HISTORY_DAYS) -> dict:
     source = store.load_since(history_days) if history_days else list(store.load_all().values())
     hidden = sum(1 for m in source if not confirmed(m))
@@ -80,6 +91,8 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
             # headline or confirmed in the body (unverified full-text matches are too noisy).
             "cmp": bool(set(m.origins) & NEUTRAL_ORIGINS),
             "vx": _companies_only_via_executive(cfg, m) or None,
+            # Only in the imported BioMar-only history (not collected by this tracker).
+            "io": m.origins == ["import"] or None,
         }
         for m in mentions
     ]
@@ -93,6 +106,9 @@ def dashboard_payload(cfg: Config, store: Store, history_days: int | None = HIST
         "tracking_since": min((m.published for m in mentions), default=None),
         # Imported history covers BioMar only; competitors are tracked from the first collected article.
         "comparable_since": min((m.published for m in mentions if set(m.origins) & NEUTRAL_ORIGINS), default=None),
+        # Systematic collection covers from the first collection run minus the backfill window;
+        # comparisons with periods before that would compare against missing data.
+        "tracked_since": _tracked_since(mentions),
         "analysis_methods": dict(Counter(m.analysis for m in mentions)),
         "unconfirmed_hidden": hidden,
         "briefings": store.latest_briefings(14),
