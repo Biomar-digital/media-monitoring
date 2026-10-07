@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-07",
+  "generated_at": "2026-10-07T06:14:43+00:00",
+  "counts_24h": {},
+  "counts_prev_7d": {
+    "Skretting": 5,
+    "BioMar": 2,
+    "Claus Eskildsen": 1,
+    "Haid Group": 1,
+    "Cargill Aqua Nutrition": 1
+  },
+  "headline": "No new BioMar coverage in the last 24 hours.",
+  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [],
+  "competitors": [],
+  "watch": [],
+  "cite": [],
+  "method": "automatic"
+}
