@@ -1,28 +1,25 @@
 {
   "date": "2026-10-08",
-  "generated_at": "2026-10-08T06:18:22+00:00",
+  "generated_at": "2026-10-08T13:43:50+00:00",
   "counts_24h": {
-    "Skretting": 3,
-    "BioMar": 1
+    "Skretting": 1
   },
   "counts_prev_7d": {
     "Skretting": 5,
-    "BioMar": 1,
+    "BioMar": 2,
     "Claus Eskildsen": 1,
     "Haid Group": 1,
     "Cargill Aqua Nutrition": 1
   },
-  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.1).",
-  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [
-    "(+) – Gjør næringen mer sårbar"
-  ],
+  "headline": "No new BioMar coverage in the last 24 hours.",
+  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [],
   "competitors": [
-    "Skretting: 3 mentions"
+    "Skretting: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "16670cc40560fcda"
+    "82e13baf0bd0d849"
   ],
   "method": "automatic"
 }
