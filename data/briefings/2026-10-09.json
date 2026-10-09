@@ -1,12 +1,13 @@
 {
   "date": "2026-10-09",
-  "generated_at": "2026-10-09T13:34:55+00:00",
+  "generated_at": "2026-10-09T22:56:11+00:00",
   "counts_24h": {
-    "Vitapro": 3,
-    "BioMar": 2
+    "BioMar": 2,
+    "Vitapro": 1
   },
   "counts_prev_7d": {
     "Skretting": 5,
+    "Vitapro": 2,
     "BioMar": 1,
     "Haid Group": 1
   },
@@ -17,7 +18,7 @@
     "Danske Bank eleva el precio objetivo de Biomar Group a 149 DKK (144), reitera comprar - BN"
   ],
   "competitors": [
-    "Vitapro: 3 mentions"
+    "Vitapro: 1 mentions"
   ],
   "watch": [],
   "cite": [
