@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-09",
+  "generated_at": "2026-10-09T06:20:27+00:00",
+  "counts_24h": {
+    "Vitapro": 2
+  },
+  "counts_prev_7d": {
+    "Skretting": 6,
+    "BioMar": 1,
+    "Haid Group": 1,
+    "Cargill Aqua Nutrition": 1
+  },
+  "headline": "No new BioMar coverage in the last 24 hours.",
+  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [],
+  "competitors": [
+    "Vitapro: 2 mentions"
+  ],
+  "watch": [],
+  "cite": [
+    "52b396043571559b"
+  ],
+  "method": "automatic"
+}
