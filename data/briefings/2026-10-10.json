@@ -1,28 +1,18 @@
 {
   "date": "2026-10-10",
-  "generated_at": "2026-10-10T06:07:06+00:00",
-  "counts_24h": {
-    "BioMar": 2,
-    "Vitapro": 1
-  },
+  "generated_at": "2026-10-10T12:48:40+00:00",
+  "counts_24h": {},
   "counts_prev_7d": {
     "Skretting": 5,
-    "Vitapro": 2,
-    "BioMar": 1,
+    "BioMar": 3,
+    "Vitapro": 3,
     "Haid Group": 1
   },
-  "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 0.1).",
-  "summary": "Tone of BioMar coverage: 1 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [
-    "Danske Bank raises price target for BioMar Group to 149 Danish kroner (144), reiterates Buy - BN",
-    "Danske Bank eleva el precio objetivo de Biomar Group a 149 DKK (144), reitera comprar - BN"
-  ],
-  "competitors": [
-    "Vitapro: 1 mentions"
-  ],
+  "headline": "No new BioMar coverage in the last 24 hours.",
+  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [],
+  "competitors": [],
   "watch": [],
-  "cite": [
-    "c81238f3cfa3b007"
-  ],
+  "cite": [],
   "method": "automatic"
 }
