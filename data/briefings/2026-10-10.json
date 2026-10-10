@@ -1,7 +1,9 @@
 {
   "date": "2026-10-10",
-  "generated_at": "2026-10-10T12:48:40+00:00",
-  "counts_24h": {},
+  "generated_at": "2026-10-10T21:57:23+00:00",
+  "counts_24h": {
+    "Cargill Aqua Nutrition": 1
+  },
   "counts_prev_7d": {
     "Skretting": 5,
     "BioMar": 3,
@@ -11,8 +13,12 @@
   "headline": "No new BioMar coverage in the last 24 hours.",
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [],
-  "competitors": [],
+  "competitors": [
+    "Cargill Aqua Nutrition: 1 mentions"
+  ],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "2c01a0229d9fbdc5"
+  ],
   "method": "automatic"
 }
