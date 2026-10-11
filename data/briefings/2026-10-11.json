@@ -1,24 +1,19 @@
 {
   "date": "2026-10-11",
-  "generated_at": "2026-10-11T06:00:42+00:00",
-  "counts_24h": {
-    "Cargill Aqua Nutrition": 1
-  },
+  "generated_at": "2026-10-11T13:05:34+00:00",
+  "counts_24h": {},
   "counts_prev_7d": {
     "Skretting": 5,
     "BioMar": 3,
     "Vitapro": 3,
-    "Haid Group": 1
+    "Haid Group": 1,
+    "Cargill Aqua Nutrition": 1
   },
   "headline": "No new BioMar coverage in the last 24 hours.",
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [],
-  "competitors": [
-    "Cargill Aqua Nutrition: 1 mentions"
-  ],
+  "competitors": [],
   "watch": [],
-  "cite": [
-    "2c01a0229d9fbdc5"
-  ],
+  "cite": [],
   "method": "automatic"
 }
