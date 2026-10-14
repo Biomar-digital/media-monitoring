@@ -1,20 +1,19 @@
 {
   "date": "2026-10-14",
-  "generated_at": "2026-10-14T12:07:04+00:00",
+  "generated_at": "2026-10-14T17:27:22+00:00",
   "counts_24h": {
-    "BioMar": 2
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "BioMar": 4,
+    "BioMar": 5,
     "Skretting": 4,
     "Vitapro": 3,
     "Cargill Aqua Nutrition": 1
   },
-  "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 0.6).",
-  "summary": "Tone of BioMar coverage: 0 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.7).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar presents experimental and farm results on a functional feeding strategy for European seabass",
-    "BioMar provides experimental and farm-scale evidence on improving European seabass survival under bacterial pressure"
+    "BioMar presents experimental and farm results on a functional feeding strategy for European seabass"
   ],
   "competitors": [],
   "watch": [],
