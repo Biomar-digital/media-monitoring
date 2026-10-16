@@ -1,21 +1,21 @@
 {
   "date": "2026-10-16",
-  "generated_at": "2026-10-16T16:54:57+00:00",
+  "generated_at": "2026-10-16T21:22:05+00:00",
   "counts_24h": {
-    "BioMar": 3,
+    "BioMar": 4,
     "Skretting": 2,
     "Mowi Feed": 1
   },
   "counts_prev_7d": {
-    "BioMar": 9,
-    "Vitapro": 3,
+    "BioMar": 10,
     "Mowi Feed": 2,
+    "Vitapro": 2,
     "Cargill Aqua Nutrition": 1
   },
-  "headline": "3 BioMar mentions in the last 24 hours (7-day daily average 1.3).",
-  "summary": "Tone of BioMar coverage: 1 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "4 BioMar mentions in the last 24 hours (7-day daily average 1.4).",
+  "summary": "Tone of BioMar coverage: 1 positive, 3 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar Launches BioRetain, Targeting Nutrient Retention in Aquafeed",
+    "Patagonic RAS 2026 abordará cómo la alimentación de precisión puede mejorar la producción de salmón",
     "BioMar outlines phased BioRetain rollout",
     "BioMar lanza un nuevo concepto de formulación nutricional con BioRetain"
   ],
@@ -25,7 +25,7 @@
   ],
   "watch": [],
   "cite": [
-    "34778b3e1d603f05"
+    "29569bb778830acf"
   ],
   "method": "automatic"
 }
