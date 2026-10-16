@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-16",
+  "generated_at": "2026-10-16T04:46:22+00:00",
+  "counts_24h": {
+    "BioMar": 5,
+    "Mowi Feed": 2
+  },
+  "counts_prev_7d": {
+    "BioMar": 5,
+    "Vitapro": 3,
+    "Cargill Aqua Nutrition": 1
+  },
+  "headline": "5 BioMar mentions in the last 24 hours (7-day daily average 0.7).",
+  "summary": "Tone of BioMar coverage: 1 positive, 4 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar lanza BioRetain para mejorar la retención de nutrientes y optimizar la formulación de alimentos acuícolas",
+    "BioMar targets nutrient retention with new formulation concept",
+    "BioMar Launches BioRetain, Targeting Nutrient Retention in Aquafeed"
+  ],
+  "competitors": [
+    "Mowi Feed: 2 mentions"
+  ],
+  "watch": [],
+  "cite": [
+    "1134691d00b7f7dc"
+  ],
+  "method": "automatic"
+}
