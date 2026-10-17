@@ -1,16 +1,14 @@
 {
   "date": "2026-10-17",
-  "generated_at": "2026-10-17T10:58:46+00:00",
+  "generated_at": "2026-10-17T15:50:09+00:00",
   "counts_24h": {
-    "BioMar": 2,
-    "Skretting": 1,
-    "Mowi Feed": 1
+    "BioMar": 2
   },
   "counts_prev_7d": {
     "BioMar": 10,
-    "Mowi Feed": 2,
-    "Cargill Aqua Nutrition": 1,
-    "Skretting": 1
+    "Mowi Feed": 3,
+    "Skretting": 2,
+    "Cargill Aqua Nutrition": 1
   },
   "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 1.4).",
   "summary": "Tone of BioMar coverage: 1 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
@@ -18,10 +16,7 @@
     "Patagonic RAS 2026 abordará cómo la alimentación de precisión puede mejorar la producción de salmón",
     "BioMar launches new approach to feed formulation with BioRetain"
   ],
-  "competitors": [
-    "Skretting: 1 mentions",
-    "Mowi Feed: 1 mentions"
-  ],
+  "competitors": [],
   "watch": [],
   "cite": [
     "29569bb778830acf"
