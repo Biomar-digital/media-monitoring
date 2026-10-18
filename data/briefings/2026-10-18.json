@@ -1,12 +1,11 @@
 {
   "date": "2026-10-18",
-  "generated_at": "2026-10-18T11:20:19+00:00",
+  "generated_at": "2026-10-18T16:07:21+00:00",
   "counts_24h": {},
   "counts_prev_7d": {
     "BioMar": 12,
     "Mowi Feed": 3,
-    "Skretting": 2,
-    "Cargill Aqua Nutrition": 1
+    "Skretting": 2
   },
   "headline": "No new BioMar coverage in the last 24 hours.",
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
