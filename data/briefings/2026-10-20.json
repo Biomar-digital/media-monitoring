@@ -1,23 +1,26 @@
 {
   "date": "2026-10-20",
-  "generated_at": "2026-10-20T17:23:49+00:00",
+  "generated_at": "2026-10-20T21:56:26+00:00",
   "counts_24h": {
-    "Skretting": 2
+    "Skretting": 2,
+    "BioMar": 1
   },
   "counts_prev_7d": {
     "BioMar": 12,
     "Skretting": 3,
     "Mowi Feed": 3
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 1.7).",
+  "summary": "Tone of BioMar coverage: 1 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar announces launch of new feed formulation product BioRetain"
+  ],
   "competitors": [
     "Skretting: 2 mentions"
   ],
   "watch": [],
   "cite": [
-    "706789001340b3b6"
+    "f69da1d428d2792f"
   ],
   "method": "automatic"
 }
