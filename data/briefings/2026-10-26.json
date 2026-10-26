@@ -1,16 +1,27 @@
 {
   "date": "2026-10-26",
-  "generated_at": "2026-10-26T05:02:05+00:00",
-  "counts_24h": {},
+  "generated_at": "2026-10-26T13:16:57+00:00",
+  "counts_24h": {
+    "BioMar": 1,
+    "Skretting": 1,
+    "Vitapro": 1
+  },
   "counts_prev_7d": {
     "Skretting": 5,
     "BioMar": 1
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
-  "competitors": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.1).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar, Multi X e INIA impulsan una acuicultura regenerativa"
+  ],
+  "competitors": [
+    "Skretting: 1 mentions",
+    "Vitapro: 1 mentions"
+  ],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "9fc5170fb57ed873"
+  ],
   "method": "automatic"
 }
