@@ -1,27 +1,28 @@
 {
   "date": "2026-10-27",
-  "generated_at": "2026-10-27T05:19:40+00:00",
+  "generated_at": "2026-10-27T12:31:29+00:00",
   "counts_24h": {
-    "Skretting": 2,
+    "Skretting": 1,
     "BioMar": 1,
     "Vitapro": 1
   },
   "counts_prev_7d": {
     "Skretting": 5,
-    "BioMar": 1
+    "BioMar": 2,
+    "Vitapro": 1
   },
-  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.1).",
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.3).",
   "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar, Multi X e INIA impulsan una acuicultura regenerativa"
+    "BioMar Group (BIOMAR:DC) PT Raised to DKK131 at Morgan Stanley"
   ],
   "competitors": [
-    "Skretting: 2 mentions",
+    "Skretting: 1 mentions",
     "Vitapro: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "9fc5170fb57ed873"
+    "9988533a49bdeafe"
   ],
   "method": "automatic"
 }
