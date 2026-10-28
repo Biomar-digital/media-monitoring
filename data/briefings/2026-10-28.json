@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-28",
+  "generated_at": "2026-10-28T06:01:12+00:00",
+  "counts_24h": {
+    "Vitapro": 1,
+    "Skretting": 1,
+    "BioMar": 1
+  },
+  "counts_prev_7d": {
+    "Skretting": 6,
+    "BioMar": 2,
+    "Vitapro": 2
+  },
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.3).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar Group (BIOMAR:DC) PT Raised to DKK131 at Morgan Stanley"
+  ],
+  "competitors": [
+    "Vitapro: 1 mentions",
+    "Skretting: 1 mentions"
+  ],
+  "watch": [],
+  "cite": [
+    "9988533a49bdeafe"
+  ],
+  "method": "automatic"
+}
