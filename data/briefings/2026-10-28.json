@@ -1,25 +1,25 @@
 {
   "date": "2026-10-28",
-  "generated_at": "2026-10-28T13:10:29+00:00",
+  "generated_at": "2026-10-28T22:50:34+00:00",
   "counts_24h": {
-    "Skretting": 4,
+    "Skretting": 3,
     "Vitapro": 1
   },
   "counts_prev_7d": {
-    "Skretting": 4,
-    "BioMar": 3,
-    "Vitapro": 2
+    "Skretting": 3,
+    "Vitapro": 3,
+    "BioMar": 2
   },
   "headline": "No new BioMar coverage in the last 24 hours.",
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [],
   "competitors": [
-    "Skretting: 4 mentions",
+    "Skretting: 3 mentions",
     "Vitapro: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "553b0310c5e18e30"
+    "3d518d9783295e0f"
   ],
   "method": "automatic"
 }
