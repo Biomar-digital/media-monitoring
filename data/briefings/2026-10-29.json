@@ -1,23 +1,23 @@
 {
   "date": "2026-10-29",
-  "generated_at": "2026-10-29T13:18:04+00:00",
+  "generated_at": "2026-10-29T22:58:02+00:00",
   "counts_24h": {
-    "Vitapro": 1
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "Skretting": 6,
-    "Vitapro": 3,
+    "Skretting": 7,
+    "Vitapro": 4,
     "BioMar": 2
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
-  "competitors": [
-    "Vitapro: 1 mentions"
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.3).",
+  "summary": "Tone of BioMar coverage: 1 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "DNB Carnegie raises its target price for Biomar Group to DKK 160 (155), reiterates Buy"
   ],
+  "competitors": [],
   "watch": [],
   "cite": [
-    "3d518d9783295e0f"
+    "6d57cde2cc4385a3"
   ],
   "method": "automatic"
 }
