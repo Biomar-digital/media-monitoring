@@ -1,12 +1,11 @@
 {
   "date": "2026-10-29",
-  "generated_at": "2026-10-29T06:02:34+00:00",
+  "generated_at": "2026-10-29T13:18:04+00:00",
   "counts_24h": {
-    "Skretting": 3,
     "Vitapro": 1
   },
   "counts_prev_7d": {
-    "Skretting": 3,
+    "Skretting": 6,
     "Vitapro": 3,
     "BioMar": 2
   },
@@ -14,7 +13,6 @@
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [],
   "competitors": [
-    "Skretting: 3 mentions",
     "Vitapro: 1 mentions"
   ],
   "watch": [],
