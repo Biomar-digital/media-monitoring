@@ -1,8 +1,8 @@
 {
   "date": "2026-10-30",
-  "generated_at": "2026-10-30T13:11:51+00:00",
+  "generated_at": "2026-10-30T22:37:08+00:00",
   "counts_24h": {
-    "Skretting": 1
+    "Skretting": 2
   },
   "counts_prev_7d": {
     "Skretting": 7,
@@ -13,7 +13,7 @@
   "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [],
   "competitors": [
-    "Skretting: 1 mentions"
+    "Skretting: 2 mentions"
   ],
   "watch": [],
   "cite": [
