@@ -1,7 +1,8 @@
 {
   "date": "2026-11-02",
-  "generated_at": "2026-11-02T06:18:29+00:00",
+  "generated_at": "2026-11-02T16:09:05+00:00",
   "counts_24h": {
+    "BioMar": 6,
     "Vitapro": 1
   },
   "counts_prev_7d": {
@@ -9,15 +10,19 @@
     "Vitapro": 4,
     "BioMar": 4
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "6 BioMar mentions in the last 24 hours (7-day daily average 0.6).",
+  "summary": "Tone of BioMar coverage: 1 positive, 5 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BIOMAR: Record Q3 EBIT lifted guidance, despite softer volume expectations and raw-material risks",
+    "Schouw & Co: Biomar Updates 2026 Guidance",
+    "Positivt resultatvarsel fra BioMar"
+  ],
   "competitors": [
     "Vitapro: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "3e649c0d4663b70e"
+    "00a09d7591c59170"
   ],
   "method": "automatic"
 }
