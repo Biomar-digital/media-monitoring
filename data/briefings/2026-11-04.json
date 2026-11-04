@@ -1,30 +1,25 @@
 {
   "date": "2026-11-04",
-  "generated_at": "2026-11-04T06:41:32+00:00",
+  "generated_at": "2026-11-04T20:06:46+00:00",
   "counts_24h": {
-    "BioMar": 31,
-    "Skretting": 3
+    "BioMar": 9
   },
   "counts_prev_7d": {
-    "BioMar": 13,
-    "Skretting": 8,
-    "Vitapro": 3
+    "BioMar": 44,
+    "Skretting": 10,
+    "Vitapro": 2
   },
-  "headline": "31 BioMar mentions in the last 24 hours (7-day daily average 1.9).",
-  "summary": "Tone of BioMar coverage: 17 positive, 13 neutral, 1 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "9 BioMar mentions in the last 24 hours (7-day daily average 6.3).",
+  "summary": "Tone of BioMar coverage: 3 positive, 6 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "Danske Bank cuts price target for BioMar Group to DKK 148 (149), reiterates buy - BN",
-    "Earnings call transcript: BioMar posts strong Q3 2026 beat as stock slips 2.4% By Investing.com",
-    "BioMar Q3 2026 slides: record earnings, guidance raised despite volume cut By Investing.com"
+    "BioMar registra resultados récord y eleva 50% su EBIT impulsado por el negocio del salmón",
+    "BioMar Posts Record Q3 Volumes and EBIT, Raises Revenue and EBIT Guidance",
+    "Food News Latam - BioMar eleva 50% su EBIT impulsada por alimento para salmón"
   ],
-  "competitors": [
-    "Skretting: 3 mentions"
-  ],
-  "watch": [
-    "Danske Bank cuts price target for BioMar Group to DKK 148 (149), reiterates buy - BN"
-  ],
+  "competitors": [],
+  "watch": [],
   "cite": [
-    "7cf1580b5268083a"
+    "1e1b61febab8b13a"
   ],
   "method": "automatic"
 }
