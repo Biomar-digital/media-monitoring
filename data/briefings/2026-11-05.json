@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-05",
+  "generated_at": "2026-11-05T07:07:43+00:00",
+  "counts_24h": {
+    "BioMar": 12,
+    "Skretting": 1
+  },
+  "counts_prev_7d": {
+    "BioMar": 48,
+    "Skretting": 10,
+    "Vitapro": 2
+  },
+  "headline": "12 BioMar mentions in the last 24 hours (7-day daily average 6.9).",
+  "summary": "Tone of BioMar coverage: 3 positive, 9 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar Posts Record Q3 Volumes and EBIT, Raises Revenue and EBIT Guidance",
+    "BioMar looks to M&A as it pushes for lasting shift to alternative feed",
+    "BioMar eleva 50% su EBIT impulsada por alimento para salmón"
+  ],
+  "competitors": [
+    "Skretting: 1 mentions"
+  ],
+  "watch": [],
+  "cite": [
+    "2cb3a559c19919b5"
+  ],
+  "method": "automatic"
+}
