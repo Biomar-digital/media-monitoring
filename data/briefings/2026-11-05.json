@@ -1,28 +1,28 @@
 {
   "date": "2026-11-05",
-  "generated_at": "2026-11-05T07:07:43+00:00",
+  "generated_at": "2026-11-05T20:16:53+00:00",
   "counts_24h": {
-    "BioMar": 12,
+    "BioMar": 5,
     "Skretting": 1
   },
   "counts_prev_7d": {
-    "BioMar": 48,
-    "Skretting": 10,
-    "Vitapro": 2
+    "BioMar": 58,
+    "Skretting": 6,
+    "Vitapro": 1
   },
-  "headline": "12 BioMar mentions in the last 24 hours (7-day daily average 6.9).",
-  "summary": "Tone of BioMar coverage: 3 positive, 9 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "5 BioMar mentions in the last 24 hours (7-day daily average 8.3).",
+  "summary": "Tone of BioMar coverage: 1 positive, 4 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar Posts Record Q3 Volumes and EBIT, Raises Revenue and EBIT Guidance",
     "BioMar looks to M&A as it pushes for lasting shift to alternative feed",
-    "BioMar eleva 50% su EBIT impulsada por alimento para salmón"
+    "Ecuador sets new standards for industrialized shrimp farming, says BioMar executive",
+    "BioMar aumenta su EBIT un 24% en 2026"
   ],
   "competitors": [
     "Skretting: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "2cb3a559c19919b5"
+    "63cf0da7f731c9f5"
   ],
   "method": "automatic"
 }
