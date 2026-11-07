@@ -1,18 +1,24 @@
 {
   "date": "2026-11-07",
-  "generated_at": "2026-11-07T06:18:23+00:00",
-  "counts_24h": {},
+  "generated_at": "2026-11-07T13:14:46+00:00",
+  "counts_24h": {
+    "BioMar": 1
+  },
   "counts_prev_7d": {
     "BioMar": 62,
-    "Skretting": 8,
+    "Skretting": 7,
     "Vitapro": 1,
     "Haid Group": 1
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 8.9).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "Biomar har oppkjøp som strategi"
+  ],
   "competitors": [],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "fe5e3816100b5a17"
+  ],
   "method": "automatic"
 }
