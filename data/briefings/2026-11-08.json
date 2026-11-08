@@ -1,25 +1,18 @@
 {
   "date": "2026-11-08",
-  "generated_at": "2026-11-08T06:16:57+00:00",
-  "counts_24h": {
-    "BioMar": 2
-  },
+  "generated_at": "2026-11-08T13:40:23+00:00",
+  "counts_24h": {},
   "counts_prev_7d": {
-    "BioMar": 62,
+    "BioMar": 64,
     "Skretting": 6,
     "Vitapro": 1,
     "Haid Group": 1
   },
-  "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 8.9).",
-  "summary": "Tone of BioMar coverage: 0 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [
-    "BioMar Group A/S (BIOMAC.XD) latest press releases and corporate news – Yahoo Finance",
-    "Biomar har oppkjøp som strategi"
-  ],
+  "headline": "No new BioMar coverage in the last 24 hours.",
+  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [],
   "competitors": [],
   "watch": [],
-  "cite": [
-    "ae9afb1a52708de2"
-  ],
+  "cite": [],
   "method": "automatic"
 }
