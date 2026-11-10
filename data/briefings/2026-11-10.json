@@ -1,25 +1,26 @@
 {
   "date": "2026-11-10",
-  "generated_at": "2026-11-10T07:36:17+00:00",
+  "generated_at": "2026-11-10T20:04:38+00:00",
   "counts_24h": {
-    "BioMar": 7
+    "Vitapro": 3,
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "BioMar": 63,
+    "BioMar": 61,
     "Skretting": 6,
     "Haid Group": 1
   },
-  "headline": "7 BioMar mentions in the last 24 hours (7-day daily average 9.0).",
-  "summary": "Tone of BioMar coverage: 6 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 8.7).",
+  "summary": "Tone of BioMar coverage: 1 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar inaugura la primera fase de la ampliación de su capacidad de producción en Ecuador",
-    "BioMar opens first phase of Ecuador feed expansion",
-    "BioMar Ecuador Inaugurates Shrimp Feed Production Expansion"
+    "BioMar expands Ecuador shrimp feed capacity as demand grows"
   ],
-  "competitors": [],
+  "competitors": [
+    "Vitapro: 3 mentions"
+  ],
   "watch": [],
   "cite": [
-    "09e13b12f483cb6e"
+    "9476a8545a57774e"
   ],
   "method": "automatic"
 }
