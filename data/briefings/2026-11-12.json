@@ -1,26 +1,27 @@
 {
   "date": "2026-11-12",
-  "generated_at": "2026-11-12T07:28:49+00:00",
+  "generated_at": "2026-11-12T20:09:27+00:00",
   "counts_24h": {
-    "Skretting": 2,
-    "Vitapro": 1
+    "Vitapro": 1,
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "BioMar": 25,
-    "Skretting": 3,
+    "BioMar": 15,
+    "Skretting": 5,
     "Vitapro": 3,
     "Haid Group": 1
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 2.1).",
+  "summary": "Tone of BioMar coverage: 1 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar A/S : launches independently assured Climate Transition Plan"
+  ],
   "competitors": [
-    "Skretting: 2 mentions",
     "Vitapro: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "6fe4b000359dc776"
+    "c9c4887fa8727ea9"
   ],
   "method": "automatic"
 }
