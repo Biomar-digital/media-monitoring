@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-17",
+  "generated_at": "2026-11-17T08:26:44+00:00",
+  "counts_24h": {
+    "BioMar": 1
+  },
+  "counts_prev_7d": {
+    "BioMar": 10,
+    "Skretting": 4,
+    "Vitapro": 4
+  },
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 1.4).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar Group A/S (BIOMAC.XD) Analyst Insights, Price Targets & Recommendations - Yahoo Finance"
+  ],
+  "competitors": [],
+  "watch": [],
+  "cite": [
+    "3ceaa3c673e5a754"
+  ],
+  "method": "automatic"
+}
