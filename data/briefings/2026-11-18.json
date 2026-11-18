@@ -1,17 +1,23 @@
 {
   "date": "2026-11-18",
-  "generated_at": "2026-11-18T07:42:14+00:00",
-  "counts_24h": {},
+  "generated_at": "2026-11-18T20:53:28+00:00",
+  "counts_24h": {
+    "BioMar": 1
+  },
   "counts_prev_7d": {
     "Skretting": 4,
-    "BioMar": 4,
-    "Vitapro": 3
+    "BioMar": 3,
+    "Vitapro": 1
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.4).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar presenta plan de transición climática con certificación independiente"
+  ],
   "competitors": [],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "7aca3c0a53bf86b5"
+  ],
   "method": "automatic"
 }
