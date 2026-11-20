@@ -1,16 +1,22 @@
 {
   "date": "2026-11-20",
-  "generated_at": "2026-11-20T07:34:39+00:00",
-  "counts_24h": {},
+  "generated_at": "2026-11-20T20:35:50+00:00",
+  "counts_24h": {
+    "BioMar": 1
+  },
   "counts_prev_7d": {
-    "BioMar": 4,
+    "BioMar": 3,
     "Skretting": 2
   },
-  "headline": "No new BioMar coverage in the last 24 hours.",
-  "summary": "Tone of BioMar coverage: 0 positive, 0 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
-  "brand": [],
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 0.4).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "Una industria que evoluciona: Patagonic RAS proyecta los próximos desafíos de la recirculación"
+  ],
   "competitors": [],
   "watch": [],
-  "cite": [],
+  "cite": [
+    "c1fe45b8d0fbf18b"
+  ],
   "method": "automatic"
 }
