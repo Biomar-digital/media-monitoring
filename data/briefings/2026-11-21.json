@@ -1,24 +1,22 @@
 {
   "date": "2026-11-21",
-  "generated_at": "2026-11-21T07:23:01+00:00",
+  "generated_at": "2026-11-21T19:29:51+00:00",
   "counts_24h": {
-    "BioMar": 3
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "BioMar": 4,
+    "BioMar": 7,
     "Skretting": 2
   },
-  "headline": "3 BioMar mentions in the last 24 hours (7-day daily average 0.6).",
-  "summary": "Tone of BioMar coverage: 0 positive, 3 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 1.0).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "Patagonic 2026 puso el foco en nutrición, eficiencia y sostenibilidad",
-    "BIOMAR",
-    "Patagonic RAS 2026: Desafíos y oportunidades de producir salmones en sistemas de recirculación"
+    "BioMar Group A/S (BIOMAC.XD) Stock Forum & Discussion - Yahoo Finance"
   ],
   "competitors": [],
   "watch": [],
   "cite": [
-    "41a1522caf7acae1"
+    "0d657a759e6914f3"
   ],
   "method": "automatic"
 }
