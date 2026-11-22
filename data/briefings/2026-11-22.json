@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-22",
+  "generated_at": "2026-11-22T07:03:57+00:00",
+  "counts_24h": {
+    "BioMar": 2
+  },
+  "counts_prev_7d": {
+    "BioMar": 7,
+    "Skretting": 2
+  },
+  "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 1.0).",
+  "summary": "Tone of BioMar coverage: 0 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "brand": [
+    "BioMar Group A/S (BIOMAC.XD) Stock Forum & Discussion - Yahoo Finance",
+    "BioMar Group A/S (BIOMAC.XD) Latest Press Releases & Corporate News - Yahoo Finance"
+  ],
+  "competitors": [],
+  "watch": [],
+  "cite": [
+    "0d657a759e6914f3"
+  ],
+  "method": "automatic"
+}
