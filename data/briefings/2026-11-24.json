@@ -1,22 +1,24 @@
 {
   "date": "2026-11-24",
-  "generated_at": "2026-11-24T10:13:44+00:00",
+  "generated_at": "2026-11-24T22:45:47+00:00",
   "counts_24h": {
-    "BioMar": 1
+    "BioMar": 3
   },
   "counts_prev_7d": {
-    "BioMar": 11,
+    "BioMar": 12,
     "Skretting": 1
   },
-  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 1.6).",
-  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "3 BioMar mentions in the last 24 hours (7-day daily average 1.7).",
+  "summary": "Tone of BioMar coverage: 0 positive, 3 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar supera una de sus metas climáticas y proyecta nuevos desafíos hacia 2030"
+    "BioMar Group A/S (BIOMAC.XC) interactive stock chart",
+    "BioMar Group A/S (BIOMAC.XC) recent insider transactions",
+    "BioMar Group A/S (BIOMAC.XC) options chain"
   ],
   "competitors": [],
   "watch": [],
   "cite": [
-    "3de2fad9d1b62e61"
+    "1a359a5b78075f10"
   ],
   "method": "automatic"
 }
