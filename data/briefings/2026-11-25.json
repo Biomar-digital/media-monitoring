@@ -1,27 +1,25 @@
 {
   "date": "2026-11-25",
-  "generated_at": "2026-11-25T08:52:40+00:00",
+  "generated_at": "2026-11-25T21:59:26+00:00",
   "counts_24h": {
-    "BioMar": 5,
-    "Skretting": 1
+    "Skretting": 3,
+    "BioMar": 1
   },
   "counts_prev_7d": {
-    "BioMar": 11,
+    "BioMar": 16,
     "Skretting": 1
   },
-  "headline": "5 BioMar mentions in the last 24 hours (7-day daily average 1.6).",
-  "summary": "Tone of BioMar coverage: 0 positive, 5 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
+  "headline": "1 BioMar mentions in the last 24 hours (7-day daily average 2.3).",
+  "summary": "Tone of BioMar coverage: 0 positive, 1 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "BioMar Group A/S (BIOMAC.XC) income statement",
-    "BioMar Group A/S (BIOMAC.XC) interactive stock chart",
-    "BioMar Group A/S (BIOMAC.XC) recent insider transactions"
+    "– Fôret er nøkkelen til Norges posisjon som sjømatnasjon"
   ],
   "competitors": [
-    "Skretting: 1 mentions"
+    "Skretting: 3 mentions"
   ],
   "watch": [],
   "cite": [
-    "0339df5632f71f43"
+    "385a291f3b4a1877"
   ],
   "method": "automatic"
 }
