@@ -1,28 +1,31 @@
 {
   "date": "2026-11-26",
-  "generated_at": "2026-11-26T08:36:46+00:00",
+  "generated_at": "2026-11-26T21:51:10+00:00",
   "counts_24h": {
-    "Skretting": 3,
     "BioMar": 2,
-    "Cargill Aqua Nutrition": 1
+    "Skretting": 2,
+    "Vitapro": 1,
+    "De Heus": 1
   },
   "counts_prev_7d": {
     "BioMar": 16,
-    "Skretting": 2
+    "Skretting": 4,
+    "Cargill Aqua Nutrition": 2
   },
   "headline": "2 BioMar mentions in the last 24 hours (7-day daily average 2.3).",
   "summary": "Tone of BioMar coverage: 0 positive, 2 neutral, 0 negative. Automated summary. Set ANTHROPIC_API_KEY to get a written briefing.",
   "brand": [
-    "– Fôret er nøkkelen til Norges posisjon som sjømatnasjon",
+    "BioMar Group A/S (2IT.F) company profile and facts",
     "– Fôret er nøkkelen"
   ],
   "competitors": [
-    "Skretting: 3 mentions",
-    "Cargill Aqua Nutrition: 1 mentions"
+    "Skretting: 2 mentions",
+    "Vitapro: 1 mentions",
+    "De Heus: 1 mentions"
   ],
   "watch": [],
   "cite": [
-    "385a291f3b4a1877"
+    "137ec4f8d058b332"
   ],
   "method": "automatic"
 }
